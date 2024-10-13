@@ -14,6 +14,8 @@ func FiltroPracticas(c *gin.Context) {
 	modalidad := c.Query("modalidad")
 	areaPractica := c.Query("area_practica")
 	jornada := c.Query("jornada")
+	ubicacion := c.Query("ubicacion")
+	fecha := c.Query("fecha_publicacion")
 
 	// Crear una lista de prácticas para almacenar los resultados
 	var practicas []models.Practica
@@ -28,9 +30,16 @@ func FiltroPracticas(c *gin.Context) {
 	if areaPractica != "" {
 		query = query.Where("area_practica = ?", areaPractica)
 	}
-
 	if jornada != "" {
 		query = query.Where("jornada = ?", jornada)
+	}
+
+	if ubicacion != "" {
+		query = query.Where("ubicacion = ?", ubicacion)
+	}
+
+	if fecha != "" {
+		query = query.Where("MONTH(fecha_publicacion) = ?", fecha)
 	}
 
 	// Ejecutar la consulta y almacenar el resultado en `practicas`

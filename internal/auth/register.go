@@ -12,10 +12,11 @@ import (
 
 // RegisterRequest estructura de los datos recibidos
 type RegisterRequest struct {
-	Email     string `json:"email" binding:"required"`
-	Password  string `json:"password" binding:"required"`
-	Nombres   string `json:"nombres" binding:"required"`
-	Apellidos string `json:"apellidos" binding:"required"`
+	Email      string `json:"email" binding:"required"`
+	Password   string `json:"password" binding:"required"`
+	Nombres    string `json:"nombres" binding:"required"`
+	Apellidos  string `json:"apellidos" binding:"required"`
+	Id_carrera uint   `json:"Id_carrera"`
 }
 
 // RegisterResponse estructura de la respuesta de registro
@@ -60,6 +61,7 @@ func RegisterHandler(c *gin.Context) {
 		Nombres:          req.Nombres,
 		Apellidos:        req.Apellidos,
 		Firebase_usuario: user.UID,
+		Id_carrera:       1,
 		Rol:              "estudiante", // Rol por defecto
 	}
 

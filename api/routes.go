@@ -2,6 +2,7 @@ package api
 
 import (
 	Cempresa "practica/Crudempresa"
+	postular "practica/Postulacionespractica"
 	"practica/internal/auth"
 	"practica/internal/upload"
 
@@ -35,6 +36,7 @@ func SetupRoutes() *gin.Engine {
 	router.GET("/Get-practicas", Cempresa.GetAllPracticas)
 	router.PUT("/Update-practicas/:id", Cempresa.UpdatePractica)
 	router.DELETE("/Delete-practica/:id", Cempresa.DeletePractica)
+
 	//filtros pagina
 	router.GET("/filtro-practicas", Cempresa.FiltroPracticas)
 
@@ -44,6 +46,7 @@ func SetupRoutes() *gin.Engine {
 		protected.POST("/complete-profile", auth.CompleteProfileHandler) // Ruta para completar perfil
 		protected.POST("/upload-image", upload.UploadImageHandler)       // Ruta para subir imágenes
 		protected.GET("/profile-status", auth.GetProfileStatusHandler)   // Ruta para obtener el estado del perfil
+		protected.POST("/postulacion-practicas/:practicaid", postular.Postularpractica)
 	}
 
 	return router

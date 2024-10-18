@@ -8,7 +8,21 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// obtiene las prácticas aplicando filtros opcionales
+// FiltroPracticas obtiene las prácticas aplicando filtros opcionales
+// @Summary Filtra las prácticas
+// @Description Filtra las prácticas según los parámetros opcionales como modalidad, área de práctica, jornada, ubicación y fecha de publicación
+// @Tags practicas
+// @Accept json
+// @Produce json
+// @Param modalidad query string false "Filtrar por modalidad (presencial, remoto, etc.)"
+// @Param area_practica query string false "Filtrar por área de práctica (ingeniería, marketing, etc.)"
+// @Param jornada query string false "Filtrar por jornada (completa, parcial, etc.)"
+// @Param ubicacion query string false "Filtrar por ubicación (ciudad, país, etc.)"
+// @Param fecha_publicacion query string false "Filtrar por mes de publicación (ejemplo: '2024-10')"
+// @Success 200 {object} gin.H "Lista de prácticas filtradas"
+// @Failure 500 {object} ErrorResponse "Error al obtener las prácticas"
+// @Router /practicas/filtro [get]
+// FiltroPracticas aplica filtros opcionales a las prácticas y devuelve el resultado
 func FiltroPracticas(c *gin.Context) {
 	// Obtener los parámetros de la solicitud (query parameters)
 	modalidad := c.Query("modalidad")

@@ -8,7 +8,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Obtener todas las prácticas
+// GetAllPracticas obtiene todas las prácticas
+// @Summary Obtiene todas las prácticas
+// @Description Recupera la lista completa de todas las prácticas registradas en la base de datos
+// @Tags practicas
+// @Accept json
+// @Produce json
+// @Success 200 {array} models.Practica "Lista de todas las prácticas"
+// @Failure 500 {object} ErrorResponse "Error al obtener las prácticas"
+// @Router /Getpracticas [get]
+// GetAllPracticas devuelve todas las prácticas almacenadas en la base de datos
 func GetAllPracticas(c *gin.Context) {
 	var practicas []models.Practica
 

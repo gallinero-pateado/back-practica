@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// RegisterRequest estructura de los datos recibidos
+// practicaRequest representa la estructura de los datos recibidos para crear una nueva práctica
 type practicaRequest struct {
 	Titulo             string    `json:"Titulo"`
 	Descripcion        string    `json:"Descripcion"`
@@ -26,6 +26,18 @@ type practicaRequest struct {
 	Jornada            string    `json:"Jornada"`
 }
 
+// Createpractica crea una nueva oferta de práctica
+// @Summary Crea una nueva oferta de práctica
+// @Description Crea una oferta de práctica basada en los datos proporcionados y la guarda en la base de datos
+// @Tags practicas
+// @Accept json
+// @Produce json
+// @Param practica body practicaRequest true "Datos de la nueva práctica"
+// @Success 200 {object} gin.H "Oferta de práctica creada exitosamente con el ID de la práctica"
+// @Failure 400 {object} ErrorResponse "Datos inválidos"
+// @Failure 500 {object} ErrorResponse "Error al guardar la práctica en la base de datos"
+// @Router /Createpracticas [post]
+// Createpractica maneja la creación de una nueva oferta de práctica
 func Createpractica(c *gin.Context) {
 	var req practicaRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -33,10 +45,10 @@ func Createpractica(c *gin.Context) {
 		return
 	}
 
-	//tomar hora de creacion
+	// Tomar la hora de creación
 	localTime := time.Now().Local()
 
-	// Crear practica
+	// Crear práctica
 	practica := models.Practica{
 		Titulo:             req.Titulo,
 		Descripcion:        req.Descripcion,
@@ -53,12 +65,13 @@ func Createpractica(c *gin.Context) {
 		Id_estado_practica: 1,
 	}
 
+	// Guardar la práctica en la base de datos
 	result := database.DB.Create(&practica)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al guardar la practica en la base de datos"})
 		return
 	}
 
-	// Respuesta exitosa
+	// Respuesta exitosa con el ID de la práctica creada
 	c.JSON(http.StatusOK, gin.H{"message": "La Oferta de practica fue creada exitosamente", "id_practica": practica.Id})
 }

@@ -26,6 +26,19 @@ type practicasRequest struct {
 	Jornada            string    `json:"Jornada"`
 }
 
+// UpdatePractica actualiza una práctica existente
+// @Summary Actualiza una práctica por su ID
+// @Description Actualiza los detalles de una práctica existente con los datos proporcionados
+// @Tags practicas
+// @Accept json
+// @Produce json
+// @Param id path string true "ID de la práctica a actualizar"
+// @Param practica body practicasRequest true "Datos de la práctica actualizada"
+// @Success 200 {object} gin.H{"message": "La práctica fue actualizada exitosamente", "id_practica": int}
+// @Failure 400 {object} gin.H{"error": "Descripción del error de solicitud"}
+// @Failure 404 {object} gin.H{"error": "Práctica no encontrada"}
+// @Failure 500 {object} gin.H{"error": "Error al actualizar la práctica en la base de datos"}
+// @Router /Upgradepracticas/{id} [put]
 func UpdatePractica(c *gin.Context) {
 	var req practicasRequest
 	if err := c.ShouldBindJSON(&req); err != nil {

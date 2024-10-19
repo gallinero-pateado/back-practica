@@ -35,7 +35,7 @@ func SetupRoutes() *gin.Engine {
 	router.POST("/Create-practicas", Cempresa.Createpractica)
 	router.GET("/Get-practicas", Cempresa.GetAllPracticas)
 	router.PUT("/Update-practicas/:id", Cempresa.UpdatePractica)
-	router.DELETE("/Delete-practica/:id", Cempresa.DeletePractica)
+	router.GET("/Get-practicas-empresa/:empresaid", Cempresa.GetPracticasEmpresas)
 
 	//filtros pagina
 	router.GET("/filtro-practicas", Cempresa.FiltroPracticas)
@@ -47,6 +47,7 @@ func SetupRoutes() *gin.Engine {
 		protected.POST("/upload-image", upload.UploadImageHandler)       // Ruta para subir imágenes
 		protected.GET("/profile-status", auth.GetProfileStatusHandler)   // Ruta para obtener el estado del perfil
 		protected.POST("/postulacion-practicas/:practicaid", postular.Postularpractica)
+		router.DELETE("/Delete-practica/:id", Cempresa.DeletePractica)
 	}
 
 	return router

@@ -47,7 +47,7 @@ func DeletePractica(c *gin.Context) {
 
 	// Buscar la empresa en la base de datos asociada al UID de Firebase
 	var empresa models.Usuario_empresa
-	result := database.DB.Where("firebase_usuario = ?", uid).First(&empresa)
+	result := database.DB.Where("firebase_usuario_empresa = ?", uid).First(&empresa)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al buscar la empresa en la base de datos"})
 		return

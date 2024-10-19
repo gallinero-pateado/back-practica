@@ -21,8 +21,6 @@ import (
 // @Failure 404 {object} ErrorResponse "Práctica no encontrada"
 // @Failure 500 {object} ErrorResponse "Error al eliminar la práctica"
 // @Router /Deletepracticas/{id} [delete]
-// DeletePractica elimina una práctica de la base de datos usando el ID proporcionado en la URL
-
 func DeletePractica(c *gin.Context) {
 	// Obtener el UID de Firebase del contexto
 	uid, exists := c.Get("uid")

@@ -1,4 +1,4 @@
-package Postulacionespractica
+package PostulacionesPractica
 
 import (
 	"fmt"

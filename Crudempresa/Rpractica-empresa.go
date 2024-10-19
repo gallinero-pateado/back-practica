@@ -1,7 +1,6 @@
 package Crudempresa
 
 import (
-	"fmt"
 	"net/http"
 	"practica/internal/database"
 	"practica/internal/models"
@@ -9,25 +8,36 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// GetPracticasEmpresas obtiene las prácticas asociadas a la empresa del usuario autenticado
+// @Summary Obtiene las prácticas de la empresa del usuario autenticado
+// @Description Recupera las prácticas asociadas a la empresa del usuario autenticado mediante su UID
+// @Tags practicas
+// @Accept json
+// @Produce json
+// @Success 200 {array} models.Practica "Lista de prácticas"
+// @Failure 401 {object} gin.H{"error": "Usuario no autenticado"}
+// @Failure 404 {object} gin.H{"error": "Prácticas no encontradas"}
+// @Router /GetPracticasEmpresas [get]
 func GetPracticasEmpresas(c *gin.Context) {
 	var practicas []models.Practica
 
-	// Obtener el ID de la empresa de la URL
-	empresaidN := c.Param("empresaid")
-	if empresaidN == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "ID de práctica no proporcionado"})
+	// Obtener el UID de Firebase del contexto
+	uid, exists := c.Get("uid")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Usuario no autenticado"})
 		return
 	}
 
-	// Convertir practicaidStr a int
-	var empresaid int
-	if _, err := fmt.Sscan(empresaidN, &empresaid); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "ID de práctica inválido"})
+	// Buscar la empresa en la base de datos asociada al UID de Firebase
+	var empresa models.Usuario_empresa
+	result := database.DB.Where("firebase_usuario_empresa = ?", uid).First(&empresa)
+	if result.Error != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Empresa no encontrada"})
 		return
 	}
 
 	// Buscar prácticas relacionadas con la empresa en la base de datos
-	if err := database.DB.Where("id_empresa = ?", empresaid).Find(&practicas).Error; err != nil {
+	if err := database.DB.Where("id_empresa = ?", empresa.Id_empresa).Find(&practicas).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Prácticas no encontradas"})
 		return
 	}

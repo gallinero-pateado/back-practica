@@ -15,6 +15,32 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/check-postulaciones": {
+            "get": {
+                "description": "Verifica cambios en la tabla de postulaciones y envía correos electrónicos si hay cambios",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "postulaciones"
+                ],
+                "summary": "Verificar cambios en la tabla de postulaciones",
+                "responses": {
+                    "200": {
+                        "description": "Verificación completada",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Error al verificar cambios",
+                        "schema": {
+                            "$ref": "#/definitions/database.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/complete-profile": {
             "post": {
                 "description": "Permite a los usuarios autenticados completar o actualizar su perfil, incluida la foto de perfil",
@@ -259,6 +285,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/register_admin": {
+            "post": {
+                "description": "Crea un nuevo usuario en Firebase y lo guarda en la base de datos local",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Registra un nuevo usuario",
+                "parameters": [
+                    {
+                        "description": "Datos del usuario a registrar",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth.RegisterRequest_admin"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Usuario registrado correctamente",
+                        "schema": {
+                            "$ref": "#/definitions/auth.RegisterResponse_admin"
+                        }
+                    },
+                    "400": {
+                        "description": "Solicitud inválida",
+                        "schema": {
+                            "$ref": "#/definitions/auth.RegisterResponse_admin"
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "schema": {
+                            "$ref": "#/definitions/auth.RegisterResponse_admin"
+                        }
+                    }
+                }
+            }
+        },
         "/register_empresa": {
             "post": {
                 "description": "Crea un nuevo usuario en Firebase y lo guarda en la base de datos local",
@@ -352,6 +424,57 @@ const docTemplate = `{
                         "description": "Error interno del servidor",
                         "schema": {
                             "$ref": "#/definitions/auth.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sendemail": {
+            "post": {
+                "description": "Sends an email to the user with the updated status of their application",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "email"
+                ],
+                "summary": "Send an email notification",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Recipient email address",
+                        "name": "to",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Application status",
+                        "name": "estadoPostulacion",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Email sent successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }
@@ -529,6 +652,25 @@ const docTemplate = `{
                 }
             }
         },
+        "auth.RegisterRequest_admin": {
+            "type": "object",
+            "required": [
+                "Email_admin",
+                "Nombre_admin",
+                "password"
+            ],
+            "properties": {
+                "Email_admin": {
+                    "type": "string"
+                },
+                "Nombre_admin": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
         "auth.RegisterRequest_empresa": {
             "type": "object",
             "required": [
@@ -559,6 +701,17 @@ const docTemplate = `{
                 }
             }
         },
+        "auth.RegisterResponse_admin": {
+            "type": "object",
+            "properties": {
+                "firebase_uid": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
         "auth.RegisterResponse_empresa": {
             "type": "object",
             "properties": {
@@ -574,6 +727,14 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "database.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
                     "type": "string"
                 }
             }

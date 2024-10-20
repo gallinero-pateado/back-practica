@@ -3,6 +3,7 @@ package api
 import (
 	Cempresa "practica/Crudempresa"
 	"practica/internal/auth"
+	"practica/internal/database"
 	"practica/internal/upload"
 
 	"github.com/gin-contrib/cors"
@@ -29,12 +30,9 @@ func SetupRoutes() *gin.Engine {
 	router.POST("/resend-verification", auth.ResendVerificationEmailHandler)
 	router.GET("/usuarios/:uid", auth.GetUsuarioByUID)
 	router.GET("/get-allusuario", auth.GetAllUsuarios)
-
 	// rutas crud practicas
 	router.POST("/Create-practicas", Cempresa.Createpractica)
 	router.GET("/Get-practicas", Cempresa.GetAllPracticas)
-	router.PUT("/Update-practicas/:id", Cempresa.UpdatePractica)
-	router.DELETE("/Delete-practica/:id", Cempresa.DeletePractica)
 	//filtros pagina
 	router.GET("/filtro-practicas", Cempresa.FiltroPracticas)
 
@@ -45,6 +43,9 @@ func SetupRoutes() *gin.Engine {
 		protected.POST("/upload-image", upload.UploadImageHandler)       // Ruta para subir imágenes
 		protected.GET("/profile-status", auth.GetProfileStatusHandler)   // Ruta para obtener el estado del perfil
 	}
+
+	router.POST("/sendEmail", database.HandleSendEmail)
+	router.GET("/check-postulaciones", database.CheckPostulacionForChangesHandler)
 
 	return router
 }

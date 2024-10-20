@@ -29,12 +29,11 @@ type RegisterResponse_admin struct {
 // @Tags auth
 // @Accept json
 // @Produce json
-// @Param user body RegisterRequest_empresa true "Datos del usuario a registrar"
-// @Success 200 {object} RegisterHandler_admin "Usuario registrado correctamente"
-// @Failure 400 {object} RegisterHandler_admin "Solicitud inválida"
-// @Failure 500 {object} RegisterHandler_admin "Error interno del servidor"
-// @Router /register_empresa [post]
-// RegisterHandler maneja el registro del usuario
+// @Param user body RegisterRequest_admin true "Datos del usuario a registrar"
+// @Success 200 {object} RegisterResponse_admin "Usuario registrado correctamente"
+// @Failure 400 {object} RegisterResponse_admin "Solicitud inválida"
+// @Failure 500 {object} RegisterResponse_admin "Error interno del servidor"
+// @Router /register_admin [post]
 func RegisterHandler_admin(c *gin.Context) {
 	var req RegisterRequest_admin
 	if err := c.ShouldBindJSON(&req); err != nil {

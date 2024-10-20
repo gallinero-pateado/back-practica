@@ -2,6 +2,7 @@ package api
 
 import (
 	Cempresa "practica/Crudempresa"
+	postular "practica/PostulacionesPractica"
 	"practica/internal/auth"
 	"practica/internal/database"
 	"practica/internal/upload"
@@ -28,10 +29,9 @@ func SetupRoutes() *gin.Engine {
 	router.GET("/verify-email", auth.VerifyEmailHandler)
 	router.POST("/password-reset", auth.SendPasswordResetEmailHandler)
 	router.POST("/resend-verification", auth.ResendVerificationEmailHandler)
-	router.GET("/usuarios/:uid", auth.GetUsuarioByUID)
+	router.GET("/usuarios/:uid", auth.GetUsuariouid)
 	router.GET("/get-allusuario", auth.GetAllUsuarios)
 	// rutas crud practicas
-	router.POST("/Create-practicas", Cempresa.Createpractica)
 	router.GET("/Get-practicas", Cempresa.GetAllPracticas)
 	//filtros pagina
 	router.GET("/filtro-practicas", Cempresa.FiltroPracticas)
@@ -39,9 +39,14 @@ func SetupRoutes() *gin.Engine {
 	// Rutas protegidas
 	protected := router.Group("/").Use(auth.AuthMiddleware) // Agrupar las rutas protegidas con el middleware
 	{
-		protected.POST("/complete-profile", auth.CompleteProfileHandler) // Ruta para completar perfil
-		protected.POST("/upload-image", upload.UploadImageHandler)       // Ruta para subir imágenes
-		protected.GET("/profile-status", auth.GetProfileStatusHandler)   // Ruta para obtener el estado del perfil
+		protected.POST("/complete-profile", auth.CompleteProfileHandler)                // Ruta para completar perfil
+		protected.POST("/upload-image", upload.UploadImageHandler)                      // Ruta para subir imágenes
+		protected.GET("/profile-status", auth.GetProfileStatusHandler)                  // Ruta para obtener el estado del perfil
+		protected.POST("/postulacion-practicas/:practicaid", postular.Postularpractica) // Ruta para postular a practicas como usuario
+		protected.DELETE("/Delete-practica/:id", Cempresa.DeletePractica)               // Ruta para borrar practica como empresa
+		protected.POST("/Create-practicas", Cempresa.Createpractica)                    // Ruta para Crear Practicas como empresa
+		protected.GET("/Get-practicas-empresa", Cempresa.GetPracticasEmpresas)          //Ruta para que la empresa vea sus practicas
+		protected.PUT("/Update-practicas/:id", Cempresa.UpdatePractica)                 //Ruta para Cambiar datos de practica
 	}
 
 	router.POST("/sendEmail", database.HandleSendEmail)

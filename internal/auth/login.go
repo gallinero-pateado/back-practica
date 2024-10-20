@@ -59,15 +59,28 @@ func LoginHandler(c *gin.Context) {
 		return
 	}
 
-	// Buscar al usuario en la base de datos usando su email
+	// Buscar al usuario en la tabla Usuario
 	var usuario models.Usuario
 	result := database.DB.Where("correo = ?", req.Email).First(&usuario)
 	if result.Error != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Usuario no encontrado"})
+		// Si no encuentra el usuario en la tabla Usuario, buscar en la tabla Usuario_empresa
+		var usuarioEmpresa models.Usuario_empresa
+		resultEmpresa := database.DB.Where("correo_empresa = ?", req.Email).First(&usuarioEmpresa)
+		if resultEmpresa.Error != nil {
+			// Si no encuentra el usuario en ninguna de las tablas, retornar error
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Usuario no encontrado"})
+			return
+		}
+
+		// Responder con el token JWT y el UID del usuario encontrado en Usuario_empresa
+		c.JSON(http.StatusOK, gin.H{
+			"token": token,
+			"uid":   usuarioEmpresa.Firebase_usuario_empresa, // Asumiendo que Usuario_empresa también tiene Firebase_usuario
+		})
 		return
 	}
 
-	// Responder con el token JWT y el UID
+	// Si se encuentra el usuario en la tabla Usuario, responder con el token JWT y el UID
 	c.JSON(http.StatusOK, gin.H{
 		"token": token,
 		"uid":   usuario.Firebase_usuario,

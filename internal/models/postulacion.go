@@ -11,6 +11,7 @@ type Postulacion struct {
 	Fecha_postulacion     time.Time `json:"default:CURRENT_TIMESTAMP"`
 	Mensaje               string    `json:"mensaje"`
 	Id_estado_postulacion int       `json:"id_estado_publicacion"`
+	Verificación          bool      `json:"verificacion"`
 }
 
 // TableName establece el nombre de la tabla para GORM

@@ -15,7 +15,7 @@ import (
 // @Accept json
 // @Produce json
 // @Success 200 {array} models.Practica "Lista de todas las prácticas"
-// @Failure 500 {object} ErrorResponse "Error al obtener las prácticas"
+// @Failure 500 {string} string "Error al obtener las prácticas"
 // @Router /Getpracticas [get]
 // GetAllPracticas devuelve todas las prácticas almacenadas en la base de datos
 func GetAllPracticas(c *gin.Context) {

@@ -15,8 +15,8 @@ import (
 // @Accept json
 // @Produce json
 // @Success 200 {array} models.Practica "Lista de prácticas"
-// @Failure 401 {object} gin.H{"error": "Usuario no autenticado"}
-// @Failure 404 {object} gin.H{"error": "Prácticas no encontradas"}
+// @Failure 401 {string} string "Usuario no autenticado"
+// @Failure 404 {string} string "Prácticas no encontradas"
 // @Router /GetPracticasEmpresas [get]
 func GetPracticasEmpresas(c *gin.Context) {
 	var practicas []models.Practica

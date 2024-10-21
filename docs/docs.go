@@ -15,6 +15,326 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/Check-NuevoPostulanteForChanges": {
+            "get": {
+                "description": "Verifica cambios en la tabla de postulaciones y envía correos electrónicos si hay cambios",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "postulaciones"
+                ],
+                "summary": "Verificar cambios en la tabla de postulaciones",
+                "responses": {
+                    "200": {
+                        "description": "Verificación completada",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Error al verificar cambios",
+                        "schema": {
+                            "$ref": "#/definitions/database.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/Deletepracticas/{id}": {
+            "delete": {
+                "description": "Elimina una práctica específica de la base de datos utilizando su ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "practicas"
+                ],
+                "summary": "Elimina una práctica por ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID de la práctica",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "La práctica fue eliminada exitosamente",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "ID inválido",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Práctica no encontrada",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Error al eliminar la práctica",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/GetAllusuarios": {
+            "get": {
+                "description": "Recupera todos los registros de usuarios almacenados en la base de datos",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "usuarios"
+                ],
+                "summary": "Obtiene una lista de todos los usuarios",
+                "responses": {
+                    "200": {
+                        "description": "Lista de usuarios obtenida con éxito",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Usuario"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error al obtener los usuarios",
+                        "schema": {
+                            "$ref": "#/definitions/auth.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/GetPracticasEmpresas": {
+            "get": {
+                "description": "Recupera las prácticas asociadas a la empresa del usuario autenticado mediante su UID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "practicas"
+                ],
+                "summary": "Obtiene las prácticas de la empresa del usuario autenticado",
+                "responses": {
+                    "200": {
+                        "description": "Lista de prácticas",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Practica"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Usuario no autenticado",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Prácticas no encontradas",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/Getpracticas": {
+            "get": {
+                "description": "Recupera la lista completa de todas las prácticas registradas en la base de datos",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "practicas"
+                ],
+                "summary": "Obtiene todas las prácticas",
+                "responses": {
+                    "200": {
+                        "description": "Lista de todas las prácticas",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Practica"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error al obtener las prácticas",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/Getusuario/{uid}": {
+            "get": {
+                "description": "Recupera la información de un usuario de la base de datos utilizando su UID de Firebase",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "usuarios"
+                ],
+                "summary": "Obtiene los datos de un usuario por su UID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "UID del usuario",
+                        "name": "uid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Datos del usuario encontrados",
+                        "schema": {
+                            "$ref": "#/definitions/models.Usuario"
+                        }
+                    },
+                    "404": {
+                        "description": "Usuario no encontrado",
+                        "schema": {
+                            "$ref": "#/definitions/auth.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/MandarCorreoNuevoPostulante": {
+            "post": {
+                "description": "Sends an email to the user with the updated status of their application",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "email"
+                ],
+                "summary": "Send an email notification",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Recipient email address",
+                        "name": "to",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Application status",
+                        "name": "estadoPostulacion",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Email sent successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/Upgradepracticas/{id}": {
+            "put": {
+                "description": "Actualiza los detalles de una práctica existente con los datos proporcionados",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "practicas"
+                ],
+                "summary": "Actualiza una práctica por su ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID de la práctica a actualizar",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Datos de la práctica actualizada",
+                        "name": "practica",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Crudempresa.practicasRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "La práctica fue actualizada exitosamente",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Descripción del error de solicitud",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Práctica no encontrada",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Error al actualizar la práctica en la base de datos",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/check-postulaciones": {
             "get": {
                 "description": "Verifica cambios en la tabla de postulaciones y envía correos electrónicos si hay cambios",
@@ -187,6 +507,67 @@ const docTemplate = `{
                         "description": "Error al enviar el correo de recuperación",
                         "schema": {
                             "$ref": "#/definitions/auth.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/practicas/filtro": {
+            "get": {
+                "description": "Filtra las prácticas según los parámetros opcionales como modalidad, área de práctica, jornada, ubicación y fecha de publicación",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "practicas"
+                ],
+                "summary": "Filtra las prácticas",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Filtrar por modalidad (presencial, remoto, etc.)",
+                        "name": "modalidad",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por área de práctica (ingeniería, marketing, etc.)",
+                        "name": "area_practica",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por jornada (completa, parcial, etc.)",
+                        "name": "jornada",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por ubicación (ciudad, país, etc.)",
+                        "name": "ubicacion",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por mes de publicación (ejemplo: '2024-10')",
+                        "name": "fecha_publicacion",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de prácticas filtradas",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Error al obtener las prácticas",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }
@@ -551,6 +932,41 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "Crudempresa.practicasRequest": {
+            "type": "object",
+            "properties": {
+                "Area_practica": {
+                    "type": "string"
+                },
+                "Descripcion": {
+                    "type": "string"
+                },
+                "Fecha_expiracion": {
+                    "type": "string"
+                },
+                "Fecha_fin": {
+                    "type": "string"
+                },
+                "Fecha_inicio": {
+                    "type": "string"
+                },
+                "Jornada": {
+                    "type": "string"
+                },
+                "Modalidad": {
+                    "type": "string"
+                },
+                "Requisitos": {
+                    "type": "string"
+                },
+                "Titulo": {
+                    "type": "string"
+                },
+                "Ubicacion": {
+                    "type": "string"
+                }
+            }
+        },
         "auth.EmailRequest": {
             "type": "object",
             "required": [
@@ -638,6 +1054,9 @@ const docTemplate = `{
                 "password"
             ],
             "properties": {
+                "Id_carrera": {
+                    "type": "integer"
+                },
                 "apellidos": {
                     "type": "string"
                 },
@@ -736,6 +1155,97 @@ const docTemplate = `{
             "properties": {
                 "error": {
                     "type": "string"
+                }
+            }
+        },
+        "models.Practica": {
+            "type": "object",
+            "properties": {
+                "Area_practica": {
+                    "type": "string"
+                },
+                "Descripcion": {
+                    "type": "string"
+                },
+                "Fecha_expiracion": {
+                    "type": "string"
+                },
+                "Fecha_fin": {
+                    "type": "string"
+                },
+                "Fecha_inicio": {
+                    "type": "string"
+                },
+                "Id_Empresa": {
+                    "type": "integer"
+                },
+                "Id_estado_practica": {
+                    "type": "integer"
+                },
+                "Jornada": {
+                    "type": "string"
+                },
+                "Modalidad": {
+                    "type": "string"
+                },
+                "Requisitos": {
+                    "type": "string"
+                },
+                "Titulo": {
+                    "type": "string"
+                },
+                "Ubicacion": {
+                    "type": "string"
+                },
+                "fecha_publicacion": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.Usuario": {
+            "type": "object",
+            "properties": {
+                "Ano_Ingreso": {
+                    "type": "string"
+                },
+                "Apellidos": {
+                    "type": "string"
+                },
+                "Correo": {
+                    "type": "string"
+                },
+                "Fecha_Nacimiento": {
+                    "type": "string"
+                },
+                "Foto_Perfil": {
+                    "type": "string"
+                },
+                "Id_Estado_Usuario": {
+                    "type": "boolean"
+                },
+                "Id_carrera": {
+                    "type": "integer"
+                },
+                "Nombres": {
+                    "type": "string"
+                },
+                "PerfilCompletado": {
+                    "type": "boolean"
+                },
+                "Rol": {
+                    "type": "string"
+                },
+                "fecha_creacion": {
+                    "type": "string"
+                },
+                "firebase_usuario": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
                 }
             }
         }

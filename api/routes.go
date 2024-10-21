@@ -49,8 +49,11 @@ func SetupRoutes() *gin.Engine {
 		protected.PUT("/Update-practicas/:id", Cempresa.UpdatePractica)                 //Ruta para Cambiar datos de practica
 	}
 
+	// Rutas de correos
 	router.POST("/sendEmail", database.HandleSendEmail)
+
 	router.GET("/check-postulaciones", database.CheckPostulacionForChangesHandler)
+	router.GET("/Check-NuevoPostulanteForChanges", database.CheckNuevoPostulanteForChangesHandler)
 
 	return router
 }

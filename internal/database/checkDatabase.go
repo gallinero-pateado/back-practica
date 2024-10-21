@@ -119,18 +119,138 @@ type ErrorResponse struct {
 	Error string `json:"error"`
 }
 
+// CheckNuevoPostulanteForChanges checks for changes in the postulacion table
+// @Summary Verificar cambios en la tabla de postulaciones
+// @Description Verifica cambios en la tabla de postulaciones y envía correos electrónicos si hay cambios
+// @Tags postulaciones
+// @Produce json
+// @Success 200 {string} string "Verificación completada"
+// @Failure 500 {object} ErrorResponse "Error al verificar cambios"
+// @Router /Check-NuevoPostulanteForChanges [get]
+func CheckNuevoPostulanteForChanges(db *gorm.DB) {
+	contador := time.NewTicker(10 * time.Second)
+	defer contador.Stop()
+	mensaje := "Tiene una nueva postulacion en su practica"
+
+	for {
+		select {
+		case <-contador.C:
+			var postulaciones []Postulacion
+
+			// Query to check for changes in the postulacion table
+			if err := db.Table("postulacion").
+				Select(`postulacion.*, "Usuario_empresa".correo_empresa, postulacion.nueva_postulacion`).
+				Joins(`left join practica on postulacion.id_practica = practica.id`).
+				Joins(`left join "Usuario_empresa" on practica.id_empresa = "Usuario_empresa".id_empresa`).
+				Where("postulacion.nueva_postulacion = ?", true).
+				Find(&postulaciones).Error; err != nil {
+				log.Fatalf("Error querying the database: %v", err)
+			}
+
+			for _, postulacion := range postulaciones {
+				// Manda un correo a la empresa
+				MandarCorreoNuevoPostulante(postulacion.Correo_empresa, mensaje)
+
+				// Actualiza el previo_estado_postulacion al actual estado_postulacion
+				if err := db.Model(&Postulacion{}).
+					Where("id = ?", postulacion.ID).
+					Update("nueva_postulacion", false).Error; err != nil {
+					log.Printf("Error updating previo_estado_postulacion for postulacion ID %d: %v", postulacion.ID, err)
+				}
+			}
+		}
+	}
+}
+
+// MandarCorreoNuevoPostulante sends an email to the user
+// @Summary Send an email notification
+// @Description Sends an email to the user with the updated status of their application
+// @Tags email
+// @Accept json
+// @Produce json
+// @Param to query string true "Recipient email address"
+// @Param estadoPostulacion query string true "Application status"
+// @Success 200 {string} string "Email sent successfully"
+// @Failure 400 {string} string "Invalid input"
+// @Failure 500 {string} string "Internal server error"
+// @Router /MandarCorreoNuevoPostulante [post]
+func MandarCorreoNuevoPostulante(to string, mensaje string) {
+	from := os.Getenv("SMTP_USER")
+	password := os.Getenv("SMTP_PASSWORD")
+	smtpHost := "smtp.gmail.com"
+	smtpPort := "587"
+
+	auth := smtp.PlainAuth("", from, password, smtpHost)
+	msg := []byte(mensaje)
+
+	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, []string{to}, msg)
+	if err != nil {
+		log.Printf("Error sending email to %s: %v", to, err)
+	}
+}
+
+func HandleMandarCorreoNuevoPostulante(c *gin.Context) {
+	to := c.Query("to")
+	mensaje := c.Query("mensaje")
+
+	if to == "" {
+		c.JSON(400, gin.H{"error": "Datos de solicitud inválidos"})
+		return
+	}
+
+	MandarCorreoNuevoPostulante(to, mensaje)
+	c.JSON(200, gin.H{"message": "Correo enviado con éxito"})
+}
+
+// CheckNuevoPostulanteForChangesHandler maneja la ruta para verificar cambios en la tabla de postulaciones
+// @Summary Verificar cambios en la tabla de postulaciones
+// @Description Verifica cambios en la tabla de postulaciones y envía correos electrónicos si hay cambios
+// @Tags postulaciones
+// @Produce json
+// @Success 200 {string} string "Verificación completada"
+// @Failure 500 {object} ErrorResponse "Error al verificar cambios"
+// @Router /Check-NuevoPostulanteForChanges [get]
+func CheckNuevoPostulanteForChangesHandler(c *gin.Context) {
+	go CheckNuevoPostulanteForChanges(DB)
+	c.JSON(http.StatusOK, gin.H{"message": "Verificación iniciada"})
+}
+
 type Postulacion struct {
 	ID                      uint
 	IDUsuario               uint
+	IDEmpresa               uint
 	IDPractica              uint
 	FechaPostulacion        time.Time
 	Mensaje                 string
 	IDEstadoPostulacion     uint
 	PrevioEstadoPostulacion uint
 	Correo                  string
+	Correo_empresa          string
 	NomEstadoPostulacion    string
+	NuevaPostulacion        bool
 }
 
 func (Postulacion) TableName() string {
 	return "postulacion"
+}
+
+type Practica struct {
+	id                 uint
+	titulo             string
+	descripcion        string
+	id_empresa         uint
+	ubicacion          string
+	fecha_inicio       time.Time
+	fecha_fin          time.Time
+	requisitos         string
+	fecha_publicacion  time.Time
+	fecha_expiracion   time.Time
+	id_estado_practica uint
+	modalidad          string
+	area_practica      string
+	jornada            string
+}
+
+func (Practica) TableName() string {
+	return "'practica'"
 }

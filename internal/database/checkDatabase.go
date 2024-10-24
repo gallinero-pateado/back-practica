@@ -8,6 +8,8 @@ import (
 
 	"net/http"
 
+	notificaciones "practica/Notificaciones"
+
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -20,38 +22,34 @@ import (
 // @Success 200 {string} string "Verificación completada"
 // @Failure 500 {object} ErrorResponse "Error al verificar cambios"
 // @Router /check-postulaciones [get]
-func CheckPostulacionForChanges(db *gorm.DB) {
-	ticker := time.NewTicker(10 * time.Second)
-	defer ticker.Stop()
-
+func CheckPostulacionForChanges(c *gin.Context, db *gorm.DB) {
 	for {
-		select {
-		case <-ticker.C:
-			var postulaciones []Postulacion
+		var postulaciones []Postulacion
 
-			// Query to check for changes in the postulacion table
-			if err := db.Table("postulacion").
-				Select(`postulacion.*, "Usuario".correo, estado_postulacion.nom_estado_postulacion`).
-				Joins(`left join "Usuario" on postulacion.id_usuario = "Usuario".id`).
-				Joins("left join estado_postulacion on postulacion.id_estado_postulacion = estado_postulacion.id_estado_postulacion").
-				Where("postulacion.id_estado_postulacion IN (2, 3) AND postulacion.previo_estado_postulacion = 1").
-				Find(&postulaciones).Error; err != nil {
-				log.Fatalf("Error querying the database: %v", err)
+		// Query to check for changes in the postulacion table
+		if err := db.Table("postulacion").
+			Select(`postulacion.*, "Usuario".correo, estado_postulacion.nom_estado_postulacion`).
+			Joins(`left join "Usuario" on postulacion.id_usuario = "Usuario".id`).
+			Joins("left join estado_postulacion on postulacion.id_estado_postulacion = estado_postulacion.id_estado_postulacion").
+			Where("postulacion.id_estado_postulacion IN (2, 3) AND postulacion.previo_estado_postulacion = 1").
+			Find(&postulaciones).Error; err != nil {
+			log.Fatalf("Error querying the database: %v", err)
+		}
+
+		for _, postulacion := range postulaciones {
+			// Send email to the user
+			err := SendEmail(postulacion.Correo, postulacion.NomEstadoPostulacion)
+			if err != nil {
+				log.Printf("Error sending email to %s: %v", postulacion.Correo, err)
 			}
+			msg := "Subject: Cambio en el estado de tu postulación\n\nEl estado de tu postulación ha cambiado a: " + postulacion.NomEstadoPostulacion
+			notificaciones.ProcesarNotificacion(c, msg)
 
-			for _, postulacion := range postulaciones {
-				// Send email to the user
-				err := SendEmail(postulacion.Correo, postulacion.NomEstadoPostulacion)
-				if err != nil {
-					log.Printf("Error sending email to %s: %v", postulacion.Correo, err)
-				}
-
-				// Actualiza el previo_estado_postulacion al actual estado_postulacion
-				if err := db.Model(&Postulacion{}).
-					Where("id = ?", postulacion.ID).
-					Update("previo_estado_postulacion", postulacion.IDEstadoPostulacion).Error; err != nil {
-					log.Printf("Error updating previo_estado_postulacion for postulacion ID %d: %v", postulacion.ID, err)
-				}
+			// Actualiza el previo_estado_postulacion al actual estado_postulacion
+			if err := db.Model(&Postulacion{}).
+				Where("id = ?", postulacion.ID).
+				Update("previo_estado_postulacion", postulacion.IDEstadoPostulacion).Error; err != nil {
+				log.Printf("Error updating previo_estado_postulacion for postulacion ID %d: %v", postulacion.ID, err)
 			}
 		}
 	}
@@ -92,7 +90,7 @@ func SendEmail(to string, estadoPostulacion string) error {
 // @Failure 500 {object} ErrorResponse "Error al verificar cambios"
 // @Router /check-postulaciones [get]
 func CheckPostulacionForChangesHandler(c *gin.Context) {
-	go CheckPostulacionForChanges(DB)
+	go CheckPostulacionForChanges(c, DB)
 	c.JSON(http.StatusOK, gin.H{"message": "Verificación iniciada"})
 }
 
@@ -128,35 +126,30 @@ type ErrorResponse struct {
 // @Failure 500 {object} ErrorResponse "Error al verificar cambios"
 // @Router /Check-NuevoPostulanteForChanges [get]
 func CheckNuevoPostulanteForChanges(db *gorm.DB) {
-	contador := time.NewTicker(10 * time.Second)
-	defer contador.Stop()
 	mensaje := "Tiene una nueva postulacion en su practica"
 
 	for {
-		select {
-		case <-contador.C:
-			var postulaciones []Postulacion
+		var postulaciones []Postulacion
 
-			// Query to check for changes in the postulacion table
-			if err := db.Table("postulacion").
-				Select(`postulacion.*, "Usuario_empresa".correo_empresa, postulacion.nueva_postulacion`).
-				Joins(`left join practica on postulacion.id_practica = practica.id`).
-				Joins(`left join "Usuario_empresa" on practica.id_empresa = "Usuario_empresa".id_empresa`).
-				Where("postulacion.nueva_postulacion = ?", true).
-				Find(&postulaciones).Error; err != nil {
-				log.Fatalf("Error querying the database: %v", err)
-			}
+		// Query to check for changes in the postulacion table
+		if err := db.Table("postulacion").
+			Select(`postulacion.*, "Usuario_empresa".correo_empresa, postulacion.nueva_postulacion`).
+			Joins(`left join practica on postulacion.id_practica = practica.id`).
+			Joins(`left join "Usuario_empresa" on practica.id_empresa = "Usuario_empresa".id_empresa`).
+			Where("postulacion.nueva_postulacion = ?", true).
+			Find(&postulaciones).Error; err != nil {
+			log.Fatalf("Error querying the database: %v", err)
+		}
 
-			for _, postulacion := range postulaciones {
-				// Manda un correo a la empresa
-				MandarCorreoNuevoPostulante(postulacion.Correo_empresa, mensaje)
+		for _, postulacion := range postulaciones {
+			// Manda un correo a la empresa
+			MandarCorreoNuevoPostulante(postulacion.CorreoEmpresa, mensaje)
 
-				// Actualiza el previo_estado_postulacion al actual estado_postulacion
-				if err := db.Model(&Postulacion{}).
-					Where("id = ?", postulacion.ID).
-					Update("nueva_postulacion", false).Error; err != nil {
-					log.Printf("Error updating previo_estado_postulacion for postulacion ID %d: %v", postulacion.ID, err)
-				}
+			// Actualiza el previo_estado_postulacion al actual estado_postulacion
+			if err := db.Model(&Postulacion{}).
+				Where("id = ?", postulacion.ID).
+				Update("nueva_postulacion", false).Error; err != nil {
+				log.Printf("Error updating previo_estado_postulacion for postulacion ID %d: %v", postulacion.ID, err)
 			}
 		}
 	}
@@ -216,41 +209,20 @@ func CheckNuevoPostulanteForChangesHandler(c *gin.Context) {
 }
 
 type Postulacion struct {
-	ID                      uint
-	IDUsuario               uint
-	IDEmpresa               uint
-	IDPractica              uint
-	FechaPostulacion        time.Time
-	Mensaje                 string
-	IDEstadoPostulacion     uint
-	PrevioEstadoPostulacion uint
-	Correo                  string
-	Correo_empresa          string
-	NomEstadoPostulacion    string
-	NuevaPostulacion        bool
+	ID                      uint      `json:"id"`
+	IDUsuario               uint      `json:"id_usuario"`
+	IDEmpresa               uint      `json:"id_empresa"`
+	IDPractica              uint      `json:"id_practica"`
+	FechaPostulacion        time.Time `json:"fecha_postulacion"`
+	Mensaje                 string    `json:"mensaje"`
+	IDEstadoPostulacion     uint      `json:"id_estado_postulacion"`
+	PrevioEstadoPostulacion uint      `json:"previo_estado_postulacion"`
+	Correo                  string    `json:"correo"`
+	CorreoEmpresa           string    `json:"correo_empresa"`
+	NomEstadoPostulacion    string    `json:"nom_estado_postulacion"`
+	NuevaPostulacion        bool      `json:"nueva_postulacion"`
 }
 
 func (Postulacion) TableName() string {
 	return "postulacion"
-}
-
-type Practica struct {
-	id                 uint
-	titulo             string
-	descripcion        string
-	id_empresa         uint
-	ubicacion          string
-	fecha_inicio       time.Time
-	fecha_fin          time.Time
-	requisitos         string
-	fecha_publicacion  time.Time
-	fecha_expiracion   time.Time
-	id_estado_practica uint
-	modalidad          string
-	area_practica      string
-	jornada            string
-}
-
-func (Practica) TableName() string {
-	return "'practica'"
 }

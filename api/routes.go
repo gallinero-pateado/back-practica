@@ -4,6 +4,7 @@ import (
 	Cempresa "practica/Crudempresa"
 	postular "practica/PostulacionesPractica"
 	"practica/internal/auth"
+	"practica/internal/database"
 	"practica/internal/upload"
 
 	"github.com/gin-contrib/cors"
@@ -47,6 +48,12 @@ func SetupRoutes() *gin.Engine {
 		protected.GET("/Get-practicas-empresa", Cempresa.GetPracticasEmpresas)          //Ruta para que la empresa vea sus practicas
 		protected.PUT("/Update-practicas/:id", Cempresa.UpdatePractica)                 //Ruta para Cambiar datos de practica
 	}
+
+	// Rutas de correos
+	router.POST("/sendEmail", database.HandleSendEmail)
+
+	router.GET("/check-postulaciones", database.CheckPostulacionForChangesHandler)
+	router.GET("/Check-NuevoPostulanteForChanges", database.CheckNuevoPostulanteForChangesHandler)
 
 	return router
 }

@@ -16,10 +16,10 @@ import (
 // @Accept json
 // @Produce json
 // @Param id path int true "ID de la práctica"
-// @Success 200 {object} gin.H "La práctica fue eliminada exitosamente"
-// @Failure 400 {object} ErrorResponse "ID inválido"
-// @Failure 404 {object} ErrorResponse "Práctica no encontrada"
-// @Failure 500 {object} ErrorResponse "Error al eliminar la práctica"
+// @Success 200 {string} string "La práctica fue eliminada exitosamente"
+// @Failure 400 {string} string "ID inválido"
+// @Failure 404 {string} string "Práctica no encontrada"
+// @Failure 500 {string} string "Error al eliminar la práctica"
 // @Router /Deletepracticas/{id} [delete]
 func DeletePractica(c *gin.Context) {
 	// Obtener el UID de Firebase del contexto

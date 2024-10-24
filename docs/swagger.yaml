@@ -1,4 +1,27 @@
 definitions:
+  Crudempresa.practicasRequest:
+    properties:
+      Area_practica:
+        type: string
+      Descripcion:
+        type: string
+      Fecha_expiracion:
+        type: string
+      Fecha_fin:
+        type: string
+      Fecha_inicio:
+        type: string
+      Jornada:
+        type: string
+      Modalidad:
+        type: string
+      Requisitos:
+        type: string
+      Titulo:
+        type: string
+      Ubicacion:
+        type: string
+    type: object
   auth.EmailRequest:
     properties:
       email:
@@ -51,6 +74,8 @@ definitions:
     type: object
   auth.RegisterRequest:
     properties:
+      Id_carrera:
+        type: integer
       apellidos:
         type: string
       email:
@@ -63,6 +88,19 @@ definitions:
     - apellidos
     - email
     - nombres
+    - password
+    type: object
+  auth.RegisterRequest_admin:
+    properties:
+      Email_admin:
+        type: string
+      Nombre_admin:
+        type: string
+      password:
+        type: string
+    required:
+    - Email_admin
+    - Nombre_admin
     - password
     type: object
   auth.RegisterRequest_empresa:
@@ -85,6 +123,13 @@ definitions:
       message:
         type: string
     type: object
+  auth.RegisterResponse_admin:
+    properties:
+      firebase_uid:
+        type: string
+      message:
+        type: string
+    type: object
   auth.RegisterResponse_empresa:
     properties:
       firebase_uid:
@@ -97,9 +142,310 @@ definitions:
       message:
         type: string
     type: object
+  database.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  models.Practica:
+    properties:
+      Area_practica:
+        type: string
+      Descripcion:
+        type: string
+      Fecha_expiracion:
+        type: string
+      Fecha_fin:
+        type: string
+      Fecha_inicio:
+        type: string
+      Id_Empresa:
+        type: integer
+      Id_estado_practica:
+        type: integer
+      Jornada:
+        type: string
+      Modalidad:
+        type: string
+      Requisitos:
+        type: string
+      Titulo:
+        type: string
+      Ubicacion:
+        type: string
+      fecha_publicacion:
+        type: string
+      id:
+        type: integer
+    type: object
+  models.Usuario:
+    properties:
+      Ano_Ingreso:
+        type: string
+      Apellidos:
+        type: string
+      Correo:
+        type: string
+      Fecha_Nacimiento:
+        type: string
+      Foto_Perfil:
+        type: string
+      Id_Estado_Usuario:
+        type: boolean
+      Id_carrera:
+        type: integer
+      Nombres:
+        type: string
+      PerfilCompletado:
+        type: boolean
+      Rol:
+        type: string
+      fecha_creacion:
+        type: string
+      firebase_usuario:
+        type: string
+      id:
+        type: integer
+    type: object
 info:
   contact: {}
 paths:
+  /Check-NuevoPostulanteForChanges:
+    get:
+      description: Verifica cambios en la tabla de postulaciones y envía correos electrónicos
+        si hay cambios
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Verificación completada
+          schema:
+            type: string
+        "500":
+          description: Error al verificar cambios
+          schema:
+            $ref: '#/definitions/database.ErrorResponse'
+      summary: Verificar cambios en la tabla de postulaciones
+      tags:
+      - postulaciones
+  /Deletepracticas/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Elimina una práctica específica de la base de datos utilizando
+        su ID
+      parameters:
+      - description: ID de la práctica
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: La práctica fue eliminada exitosamente
+          schema:
+            type: string
+        "400":
+          description: ID inválido
+          schema:
+            type: string
+        "404":
+          description: Práctica no encontrada
+          schema:
+            type: string
+        "500":
+          description: Error al eliminar la práctica
+          schema:
+            type: string
+      summary: Elimina una práctica por ID
+      tags:
+      - practicas
+  /GetAllusuarios:
+    get:
+      description: Recupera todos los registros de usuarios almacenados en la base
+        de datos
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Lista de usuarios obtenida con éxito
+          schema:
+            items:
+              $ref: '#/definitions/models.Usuario'
+            type: array
+        "500":
+          description: Error al obtener los usuarios
+          schema:
+            $ref: '#/definitions/auth.ErrorResponse'
+      summary: Obtiene una lista de todos los usuarios
+      tags:
+      - usuarios
+  /GetPracticasEmpresas:
+    get:
+      consumes:
+      - application/json
+      description: Recupera las prácticas asociadas a la empresa del usuario autenticado
+        mediante su UID
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Lista de prácticas
+          schema:
+            items:
+              $ref: '#/definitions/models.Practica'
+            type: array
+        "401":
+          description: Usuario no autenticado
+          schema:
+            type: string
+        "404":
+          description: Prácticas no encontradas
+          schema:
+            type: string
+      summary: Obtiene las prácticas de la empresa del usuario autenticado
+      tags:
+      - practicas
+  /Getpracticas:
+    get:
+      consumes:
+      - application/json
+      description: Recupera la lista completa de todas las prácticas registradas en
+        la base de datos
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Lista de todas las prácticas
+          schema:
+            items:
+              $ref: '#/definitions/models.Practica'
+            type: array
+        "500":
+          description: Error al obtener las prácticas
+          schema:
+            type: string
+      summary: Obtiene todas las prácticas
+      tags:
+      - practicas
+  /Getusuario/{uid}:
+    get:
+      description: Recupera la información de un usuario de la base de datos utilizando
+        su UID de Firebase
+      parameters:
+      - description: UID del usuario
+        in: path
+        name: uid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Datos del usuario encontrados
+          schema:
+            $ref: '#/definitions/models.Usuario'
+        "404":
+          description: Usuario no encontrado
+          schema:
+            $ref: '#/definitions/auth.ErrorResponse'
+      summary: Obtiene los datos de un usuario por su UID
+      tags:
+      - usuarios
+  /MandarCorreoNuevoPostulante:
+    post:
+      consumes:
+      - application/json
+      description: Sends an email to the user with the updated status of their application
+      parameters:
+      - description: Recipient email address
+        in: query
+        name: to
+        required: true
+        type: string
+      - description: Application status
+        in: query
+        name: estadoPostulacion
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Email sent successfully
+          schema:
+            type: string
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Send an email notification
+      tags:
+      - email
+  /Upgradepracticas/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Actualiza los detalles de una práctica existente con los datos
+        proporcionados
+      parameters:
+      - description: ID de la práctica a actualizar
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Datos de la práctica actualizada
+        in: body
+        name: practica
+        required: true
+        schema:
+          $ref: '#/definitions/Crudempresa.practicasRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: La práctica fue actualizada exitosamente
+          schema:
+            type: string
+        "400":
+          description: Descripción del error de solicitud
+          schema:
+            type: string
+        "404":
+          description: Práctica no encontrada
+          schema:
+            type: string
+        "500":
+          description: Error al actualizar la práctica en la base de datos
+          schema:
+            type: string
+      summary: Actualiza una práctica por su ID
+      tags:
+      - practicas
+  /check-postulaciones:
+    get:
+      description: Verifica cambios en la tabla de postulaciones y envía correos electrónicos
+        si hay cambios
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Verificación completada
+          schema:
+            type: string
+        "500":
+          description: Error al verificar cambios
+          schema:
+            $ref: '#/definitions/database.ErrorResponse'
+      summary: Verificar cambios en la tabla de postulaciones
+      tags:
+      - postulaciones
   /complete-profile:
     post:
       consumes:
@@ -201,6 +547,47 @@ paths:
       summary: Envía un correo de recuperación de contraseña
       tags:
       - password
+  /practicas/filtro:
+    get:
+      consumes:
+      - application/json
+      description: Filtra las prácticas según los parámetros opcionales como modalidad,
+        área de práctica, jornada, ubicación y fecha de publicación
+      parameters:
+      - description: Filtrar por modalidad (presencial, remoto, etc.)
+        in: query
+        name: modalidad
+        type: string
+      - description: Filtrar por área de práctica (ingeniería, marketing, etc.)
+        in: query
+        name: area_practica
+        type: string
+      - description: Filtrar por jornada (completa, parcial, etc.)
+        in: query
+        name: jornada
+        type: string
+      - description: Filtrar por ubicación (ciudad, país, etc.)
+        in: query
+        name: ubicacion
+        type: string
+      - description: 'Filtrar por mes de publicación (ejemplo: ''2024-10'')'
+        in: query
+        name: fecha_publicacion
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Lista de prácticas filtradas
+          schema:
+            type: string
+        "500":
+          description: Error al obtener las prácticas
+          schema:
+            type: string
+      summary: Filtra las prácticas
+      tags:
+      - practicas
   /profile-status:
     get:
       description: Retorna si el perfil ha sido completado o no
@@ -260,6 +647,37 @@ paths:
           description: Error interno del servidor
           schema:
             $ref: '#/definitions/auth.RegisterResponse'
+      summary: Registra un nuevo usuario
+      tags:
+      - auth
+  /register_admin:
+    post:
+      consumes:
+      - application/json
+      description: Crea un nuevo usuario en Firebase y lo guarda en la base de datos
+        local
+      parameters:
+      - description: Datos del usuario a registrar
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/auth.RegisterRequest_admin'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Usuario registrado correctamente
+          schema:
+            $ref: '#/definitions/auth.RegisterResponse_admin'
+        "400":
+          description: Solicitud inválida
+          schema:
+            $ref: '#/definitions/auth.RegisterResponse_admin'
+        "500":
+          description: Error interno del servidor
+          schema:
+            $ref: '#/definitions/auth.RegisterResponse_admin'
       summary: Registra un nuevo usuario
       tags:
       - auth
@@ -328,6 +746,40 @@ paths:
       summary: Reenviar correo de verificación
       tags:
       - verification
+  /sendemail:
+    post:
+      consumes:
+      - application/json
+      description: Sends an email to the user with the updated status of their application
+      parameters:
+      - description: Recipient email address
+        in: query
+        name: to
+        required: true
+        type: string
+      - description: Application status
+        in: query
+        name: estadoPostulacion
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Email sent successfully
+          schema:
+            type: string
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Send an email notification
+      tags:
+      - email
   /upload-image:
     post:
       consumes:

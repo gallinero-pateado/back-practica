@@ -2,6 +2,7 @@ package api
 
 import (
 	Cempresa "practica/Crudempresa"
+	foro "practica/Foro"
 	postular "practica/PostulacionesPractica"
 	"practica/internal/auth"
 	"practica/internal/database"
@@ -47,6 +48,10 @@ func SetupRoutes() *gin.Engine {
 		protected.POST("/Create-practicas", Cempresa.Createpractica)                    // Ruta para Crear Practicas como empresa
 		protected.GET("/Get-practicas-empresa", Cempresa.GetPracticasEmpresas)          //Ruta para que la empresa vea sus practicas
 		protected.PUT("/Update-practicas/:id", Cempresa.UpdatePractica)                 //Ruta para Cambiar datos de practica
+		protected.POST("/temas", foro.CrearTema)                                        // Crear un nuevo tema
+		protected.POST("/temas/:id/comentarios", foro.AñadirComentario)                 // Añadir un comentario a un tema
+		protected.PUT("/comentarios/:id", foro.ActualizarComentario)                    // Actualizar un comentario
+		protected.DELETE("/comentarios/:id", foro.EliminarComentario)                   // Eliminar un comentario
 	}
 
 	// Rutas de correos

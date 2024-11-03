@@ -38,6 +38,8 @@ func SetupRoutes() *gin.Engine {
 	router.GET("/filtro-practicas", Cempresa.FiltroPracticas)
 	//leer comentarios
 	router.GET("/temas/:id/comentarios", foro.LeerComentarios)
+	//leer temas
+	router.GET("/temas", foro.LeerTemas)
 
 	// Rutas protegidas
 	protected := router.Group("/").Use(auth.AuthMiddleware) // Agrupar las rutas protegidas con el middleware

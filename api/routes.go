@@ -4,6 +4,7 @@ import (
 	Cempresa "practica/Crudempresa"
 	foro "practica/Foro"
 	postular "practica/PostulacionesPractica"
+	controllers "practica/controllers"
 	"practica/internal/auth"
 	"practica/internal/database"
 	"practica/internal/upload"
@@ -40,6 +41,8 @@ func SetupRoutes() *gin.Engine {
 	router.GET("/temas/:id/comentarios", foro.LeerComentarios)
 	//leer temas
 	router.GET("/temas", foro.LeerTemas)
+
+	router.GET("/obtener-comentarios", controllers.ObtenerComentarios)
 
 	// Rutas protegidas
 	protected := router.Group("/").Use(auth.AuthMiddleware) // Agrupar las rutas protegidas con el middleware

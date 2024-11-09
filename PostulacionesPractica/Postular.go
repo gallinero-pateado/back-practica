@@ -50,7 +50,7 @@ func Postularpractica(c *gin.Context) {
 
 	// Buscar el usuario por el uid de Firebase
 	var usuario models.Usuario
-	result := database.DB.Where("firebase_usuario = ?", uid).First(&usuario)
+	result := database.DB.Where("firebase_usuario = ?", uid).Take(&usuario)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al buscar el usuario en la base de datos"})
 		return
@@ -76,6 +76,7 @@ func Postularpractica(c *gin.Context) {
 		Id_estado_postulacion: 1,           // Ajusta según tu lógica de estado
 		Mensaje:               req.Mensaje, // Mensaje proporcionado por el usuario
 		Id_practica:           practicaid,
+		Verificación:          false,
 	}
 	// Generar un token verificador
 	token, err := GenerateVerificationToken(usuario.Correo, uint(postulacion.Id_practica), int(usuario.Id))

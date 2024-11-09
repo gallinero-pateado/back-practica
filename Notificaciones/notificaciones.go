@@ -3,6 +3,8 @@ package notificaciones
 import (
 	"net/http"
 
+	websocket "practica/websocket"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -27,6 +29,7 @@ func ProcesarNotificacion(c *gin.Context, mensaje string) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Datos inválidos"})
 		return
 	}
+	websocket.Broadcast <- websocket.MensajeNotificacion{Mensaje: req.Mensaje}
 	c.JSON(http.StatusOK, gin.H{"mensaje": mensaje})
 }
 

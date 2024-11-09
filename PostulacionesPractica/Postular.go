@@ -76,7 +76,7 @@ func Postularpractica(c *gin.Context) {
 		Id_estado_postulacion: 1,           // Ajusta según tu lógica de estado
 		Mensaje:               req.Mensaje, // Mensaje proporcionado por el usuario
 		Id_practica:           practicaid,
-		Verificación:          false,
+		Verificacion:          false,
 	}
 	// Generar un token verificador
 	token, err := GenerateVerificationToken(usuario.Correo, uint(postulacion.Id_practica), int(usuario.Id))

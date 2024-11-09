@@ -1,13 +1,16 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"net/http"
 	"practica/api"
 	"practica/internal/auth"
 	"practica/internal/database"
 	"practica/internal/models"
 	"practica/internal/storage"
 	"practica/pkg/config"
+	"practica/websocket"
 
 	_ "practica/docs" // Importar la documentación generada
 
@@ -64,4 +67,11 @@ func main() {
 
 	// Iniciar el servidor
 	router.Run(":8080")
+
+	//Iniciar el websocket
+	http.HandleFunc("/ws", websocket.HandleWebsocket)
+	fmt.Println("El servidor de websocket está corriendo en el puerto: 8080/ws")
+	if err := http.ListenAndServe(":8080", nil); err != nil {
+		fmt.Println(err)
+	}
 }

@@ -3,6 +3,7 @@ package api
 import (
 	Cempresa "practica/Crudempresa"
 	foro "practica/Foro"
+	notificaciones "practica/Notificaciones"
 	postular "practica/PostulacionesPractica"
 	controllers "practica/controllers"
 	"practica/internal/auth"
@@ -64,6 +65,10 @@ func SetupRoutes() *gin.Engine {
 	// Rutas de correos
 	router.POST("/sendEmail", database.HandleSendEmail)
 
+	// Notificaciones
+	router.POST("/Obtener-notificaciones", notificaciones.Notificacion)
+
+	// Chequea cambios
 	router.GET("/check-postulaciones", database.CheckPostulacionForChangesHandler)
 	router.GET("/Check-NuevoPostulanteForChanges", database.CheckNuevoPostulanteForChangesHandler)
 

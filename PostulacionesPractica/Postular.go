@@ -157,7 +157,7 @@ func VerifyPostulacionHandler(c *gin.Context) {
 
 		c.JSON(http.StatusOK, gin.H{"message": "Postulacion verificada exitosamente."})
 		msg := "Se verifico tu postulacion"
-		websocket.SendNotification(fmt.Sprintf("%d", idusuario), msg)
+		websocket.NotificarClientes("alguien", fmt.Sprintf("%d", idusuario), msg)
 
 	} else {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Token inválido o expirado"})

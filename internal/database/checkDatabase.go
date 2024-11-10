@@ -44,7 +44,7 @@ func CheckPostulacionForChanges(c *gin.Context, db *gorm.DB) {
 			}
 			clienteID := postulacion.IDUsuario
 			msg := "Subject: Cambio en el estado de tu postulación\n\nEl estado de tu postulación ha cambiado a: " + postulacion.NomEstadoPostulacion
-			websocket.SendNotification(fmt.Sprintf("%d", clienteID), msg)
+			websocket.NotificarClientes("alguien", fmt.Sprintf("%d", clienteID), msg)
 
 			// Actualiza el previo_estado_postulacion al actual estado_postulacion
 			if err := db.Model(&Postulacion{}).

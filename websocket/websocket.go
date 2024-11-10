@@ -68,20 +68,27 @@ func HandleWebSocket(c *gin.Context) {
 	Mutex.Unlock()
 
 	// Manejar la conexión WebSocket
-	for {
-		var msg MensajeNotificacion
-		err := conn.ReadJSON(&msg)
-		if err != nil {
-			log.Printf("error: %v", err)
+	go func() {
+		defer func() {
 			Mutex.Lock()
 			delete(Clientes, id)
 			Mutex.Unlock()
-			break
+			cliente.Conn.Close()
+		}()
+		for {
+			var msg MensajeNotificacion
+			err := conn.ReadJSON(&msg)
+			if err != nil {
+				log.Printf("error: %v", err)
+				Mutex.Lock()
+				delete(Clientes, id)
+				Mutex.Unlock()
+				break
+			}
+			Broadcast <- msg
 		}
-		Broadcast <- msg
-	}
+	}()
 }
-
 func NotificarClientes(ID_remitente string, contenido string, ID_cliente string) {
 	id, err := strconv.ParseUint(ID_cliente, 10, 64)
 	if err != nil {

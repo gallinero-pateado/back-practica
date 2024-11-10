@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"practica/api"
@@ -76,7 +77,7 @@ func main() {
 				if err != nil {
 					log.Printf("error sending message: %v", err)
 					cliente.Conn.Close()
-					delete(websocket.Clientes, string(cliente.Id))
+					delete(websocket.Clientes, fmt.Sprintf("%d", cliente.Id))
 				}
 			}
 			websocket.Mutex.Unlock()

@@ -9,7 +9,7 @@ import (
 	"practica/internal/models"
 	"practica/internal/storage"
 	"practica/pkg/config"
-	websocket "practica/websocket"
+	"practica/websocket"
 
 	_ "practica/docs" // Importar la documentación generada
 
@@ -67,14 +67,19 @@ func main() {
 	// Iniciar el servidor
 	router.Run(":8080")
 
-	//Iniciar el websocket
-	http.HandleFunc("/ws", websocket.HandleConnections)
 	go func() {
 		for {
 			msg := <-websocket.Broadcast
-			for id := range websocket.Clientes {
-				websocket.SendNotification(id, msg.Mensaje)
+			websocket.Mutex.Lock()
+			for _, cliente := range websocket.Clientes {
+				err := cliente.Conn.WriteJSON(msg)
+				if err != nil {
+					log.Printf("error sending message: %v", err)
+					cliente.Conn.Close()
+					delete(websocket.Clientes, string(cliente.Id))
+				}
 			}
+			websocket.Mutex.Unlock()
 		}
 	}()
 	log.Fatal(http.ListenAndServe(":8080", nil))

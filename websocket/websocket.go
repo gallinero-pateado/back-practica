@@ -3,8 +3,10 @@ package websocket
 import (
 	"log"
 	"net/http"
+	"strconv"
 	"sync"
 
+	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
 
@@ -17,11 +19,11 @@ var upgrader = websocket.Upgrader{
 }
 
 type Cliente struct {
-	conn *websocket.Conn
-	id   string
+	Conn *websocket.Conn
+	Id   uint `json:"id"`
 }
 
-type MensajeNotificacion struct {
+type ComentarioNotificacion struct {
 	Mensaje string `json:"mensaje"`
 }
 
@@ -29,49 +31,88 @@ var Clientes = make(map[string]*Cliente)
 var Broadcast = make(chan MensajeNotificacion)
 var Mutex = &sync.Mutex{}
 
-func HandleConnections(w http.ResponseWriter, r *http.Request) {
-	ws, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer ws.Close()
+type MensajeNotificacion struct {
+	ID_remitente string `json:"ID_remitente"`
+	Contenido    string `json:"Contenido"`
+}
 
-	ClienteID := r.URL.Query().Get("id")
-	if ClienteID == "" {
-		log.Println("Client ID is required")
+func NuevoCliente(Conn *websocket.Conn, ID uint) *Cliente {
+	return &Cliente{
+		Conn: Conn,
+		Id:   ID,
+	}
+}
+
+func HandleWebSocket(c *gin.Context) {
+	// Obtener la ID del usuario desde la URL
+	id := c.Param("id")
+
+	// Actualizar la conexión HTTP a una conexión WebSocket
+	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "No se pudo actualizar a WebSocket"})
 		return
 	}
 
-	cliente := &Cliente{conn: ws, id: ClienteID}
+	// Crear un nuevo cliente con la conexión WebSocket y la ID
+	idUint, err := strconv.ParseUint(id, 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID inválido"})
+		return
+	}
+	cliente := &Cliente{Conn: conn, Id: uint(idUint)}
+
+	// Agregar el cliente a la lista de clientes conectados
 	Mutex.Lock()
-	Clientes[ClienteID] = cliente
+	Clientes[id] = cliente
 	Mutex.Unlock()
 
+	// Manejar la conexión WebSocket
 	for {
 		var msg MensajeNotificacion
-		err := ws.ReadJSON(&msg)
+		err := conn.ReadJSON(&msg)
 		if err != nil {
 			log.Printf("error: %v", err)
-			delete(Clientes, ClienteID)
+			Mutex.Lock()
+			delete(Clientes, id)
+			Mutex.Unlock()
 			break
 		}
 		Broadcast <- msg
 	}
 }
 
-func SendNotification(clienteID string, mensaje string) {
+func NotificarClientes(ID_remitente string, contenido string, ID_cliente string) {
+	id, err := strconv.ParseUint(ID_cliente, 10, 64)
+	if err != nil {
+		log.Printf("error parsing ID_cliente: %v", err)
+		return
+	}
+	mensaje := MensajeNotificacion{Contenido: contenido}
+
 	Mutex.Lock()
-	cliente, ok := Clientes[clienteID]
-	Mutex.Unlock()
-	if ok {
-		notificacion := MensajeNotificacion{Mensaje: mensaje}
-		err := cliente.conn.WriteJSON(notificacion)
-		if err != nil {
-			log.Printf("error: %v", err)
-			cliente.conn.Close()
-			Mutex.Lock()
-			delete(Clientes, clienteID)
-			Mutex.Unlock()
+	defer Mutex.Unlock()
+
+	for _, cliente := range Clientes {
+		if cliente.Id == uint(id) {
+			err := cliente.Conn.WriteJSON(mensaje)
+			if err != nil {
+				log.Printf("error sending message: %v", err)
+			}
 		}
 	}
+}
+
+func BroadcastMessage(c *gin.Context) {
+	var json struct {
+		ID_remitente string `json:"id_remitente"`
+		Contenido    string `json:"contenido"`
+		ID_cliente   string `json:"id_cliente"`
+	}
+	if err := c.ShouldBindJSON(&json); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	NotificarClientes(json.ID_remitente, json.Contenido, json.ID_cliente)
+	c.JSON(http.StatusOK, gin.H{"status": "notificación enviada"})
 }

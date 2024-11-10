@@ -2,6 +2,9 @@ package notificaciones
 
 import (
 	"net/http"
+	"practica/internal/database"
+	"practica/internal/models"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -34,4 +37,14 @@ func ProcesarNotificacion(c *gin.Context, mensaje string) {
 func Notificacion(c *gin.Context) {
 	mensaje := "Mensaje de prueba"
 	ProcesarNotificacion(c, mensaje)
+}
+
+func GuardarNotificacion(idMensaje int, idReceptor int) error {
+	NotificacionFront := models.NotificacionesFront{
+		Id_mensaje:         idMensaje,
+		Id_receptor:        idReceptor,
+		Fecha_hora_mensaje: time.Now(),
+		Estado:             "Enviado",
+	}
+	return database.DB.Create(&NotificacionFront).Error
 }

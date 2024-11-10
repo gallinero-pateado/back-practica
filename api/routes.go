@@ -9,6 +9,7 @@ import (
 	"practica/internal/auth"
 	"practica/internal/database"
 	"practica/internal/upload"
+	websocket "practica/websocket"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -72,5 +73,7 @@ func SetupRoutes() *gin.Engine {
 	router.GET("/check-postulaciones", database.CheckPostulacionForChangesHandler)
 	router.GET("/Check-NuevoPostulanteForChanges", database.CheckNuevoPostulanteForChangesHandler)
 
+	router.GET("/ws/:id", websocket.HandleWebSocket)
+	router.POST("/notify", websocket.BroadcastMessage)
 	return router
 }

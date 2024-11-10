@@ -56,7 +56,7 @@ func SetupRoutes() *gin.Engine {
 		protected.POST("/temas/:id/comentarios", foro.AñadirComentario)                 // Añadir un comentario a un tema
 		protected.PUT("/comentarios/:id", foro.ActualizarComentario)                    // Actualizar un comentario
 		protected.DELETE("/comentarios/:id", foro.EliminarComentario)                   // Eliminar un comentario
-		protected.POST("/comentario/:id/respuesta", foro.ReposnderComentario)           // Responde comentario
+		protected.POST("/comentarios/:id/respuesta", foro.ResponderComentario)
 	}
 
 	// Rutas de correos

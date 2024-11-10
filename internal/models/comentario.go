@@ -7,7 +7,7 @@ type Comentario struct {
 	TemaID            int64     `json:"tema_id"`
 	UsuarioID         uint      `json:"usuario_id"`
 	Contenido         string    `json:"contenido"`
-	ComentarioPadreID *uint     `json:"comentario_padre_id,omitempty"` // ID del comentario padre (si es una respuesta)
+	ComentarioPadreID *uint     `json:"comentario_padre_id,omitempty"`
 	FechaCreacion     time.Time `json:"fecha_creacion" gorm:"autoCreateTime"`
 }
 

@@ -10,7 +10,7 @@ import (
 )
 
 // Añadir un comentario o respuesta a un tema
-func ReposnderComentario(c *gin.Context) {
+func ResponderComentario(c *gin.Context) {
 	var nuevoComentario models.Comentario
 	if err := c.ShouldBindJSON(&nuevoComentario); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

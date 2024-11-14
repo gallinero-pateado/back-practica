@@ -3,7 +3,8 @@ package main
 import (
 	"fmt"
 	"log"
-	"net/http"
+
+	//"net/http"
 	"practica/api"
 	"practica/internal/auth"
 	"practica/internal/database"
@@ -65,9 +66,6 @@ func main() {
 	// Agregar la ruta de Swagger
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	// Iniciar el servidor
-	router.Run(":8080")
-
 	go func() {
 		for {
 			msg := <-websocket.Broadcast
@@ -83,5 +81,9 @@ func main() {
 			websocket.Mutex.Unlock()
 		}
 	}()
-	log.Fatal(http.ListenAndServe(":8080", nil))
+
+	// Mostrar en consola que el WebSocket está activo
+	log.Println("WebSocket server is active and listening for connections")
+	// Iniciar el servidor
+	router.Run(":8080")
 }

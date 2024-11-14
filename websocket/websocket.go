@@ -1,6 +1,7 @@
 package websocket
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -43,51 +44,29 @@ func NuevoCliente(Conn *websocket.Conn, ID uint) *Cliente {
 	}
 }
 
-func HandleWebSocket(c *gin.Context) {
-	// Obtener la ID del usuario desde la URL
-	id := c.Param("id")
-
-	// Actualizar la conexión HTTP a una conexión WebSocket
-	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "No se pudo actualizar a WebSocket"})
-		return
-	}
-
-	// Crear un nuevo cliente con la conexión WebSocket y la ID
-	idUint, err := strconv.ParseUint(id, 10, 32)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "ID inválido"})
-		return
-	}
-	cliente := &Cliente{Conn: conn, Id: uint(idUint)}
-
-	// Agregar el cliente a la lista de clientes conectados
-	Mutex.Lock()
-	Clientes[id] = cliente
-	Mutex.Unlock()
-
-	// Manejar la conexión WebSocket
-	go func() {
-		defer func() {
-			Mutex.Lock()
-			delete(Clientes, id)
-			Mutex.Unlock()
-			cliente.Conn.Close()
-		}()
-		for {
-			var msg MensajeNotificacion
-			err := conn.ReadJSON(&msg)
-			if err != nil {
-				log.Printf("error: %v", err)
-				Mutex.Lock()
-				delete(Clientes, id)
-				Mutex.Unlock()
-				break
-			}
-			Broadcast <- msg
+func Handle_WebSocket() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Obtener la ID del usuario desde la URL
+		conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
+		if err != nil {
+			fmt.Println(err)
+			return
 		}
-	}()
+		defer conn.Close()
+		for {
+			mt, mensaje, err := conn.ReadMessage() // Leer el mensaje del cliente
+			if err != nil {                        // Manejar errores
+				fmt.Println(err)
+				return
+			}
+			fmt.Printf("Recibido: %s\n", mensaje)
+			err = conn.WriteMessage(mt, mensaje)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+		}
+	}
 }
 func NotificarClientes(ID_remitente string, contenido string, ID_cliente string) {
 	id, err := strconv.ParseUint(ID_cliente, 10, 64)

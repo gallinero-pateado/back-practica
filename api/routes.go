@@ -20,7 +20,7 @@ func SetupRoutes() *gin.Engine {
 
 	// Configurar CORS
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:5173"}, // Cambia el puerto si es necesario
+		AllowOrigins:     []string{"*"}, // Cambia el puerto si es necesario
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Authorization", "Content-Type"},
 		ExposeHeaders:    []string{"Content-Length", "Authorization"},
@@ -73,7 +73,7 @@ func SetupRoutes() *gin.Engine {
 	router.GET("/check-postulaciones", database.CheckPostulacionForChangesHandler)
 	router.GET("/Check-NuevoPostulanteForChanges", database.CheckNuevoPostulanteForChangesHandler)
 
-	router.GET("/ws/:id", websocket.HandleWebSocket)
+	router.GET("/ws", websocket.Handle_WebSocket())
 	router.POST("/notify", websocket.BroadcastMessage)
 	return router
 }

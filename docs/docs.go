@@ -41,7 +41,60 @@ const docTemplate = `{
                 }
             }
         },
-        "/Deletepracticas/{id}": {
+        "/Create-practicas": {
+            "post": {
+                "description": "Crea una oferta de práctica basada en los datos proporcionados y la guarda en la base de datos",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "practicas"
+                ],
+                "summary": "Crea una nueva oferta de práctica",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Datos de la nueva práctica",
+                        "name": "practica",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Crudempresa.practicaRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Oferta de práctica creada exitosamente con el ID de la práctica",
+                        "schema": {
+                            "$ref": "#/definitions/Crudempresa.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Datos inválidos",
+                        "schema": {
+                            "$ref": "#/definitions/Crudempresa.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Error al guardar la práctica en la base de datos",
+                        "schema": {
+                            "$ref": "#/definitions/Crudempresa.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/Delete-practica/{id}": {
             "delete": {
                 "description": "Elimina una práctica específica de la base de datos utilizando su ID",
                 "consumes": [
@@ -55,6 +108,13 @@ const docTemplate = `{
                 ],
                 "summary": "Elimina una práctica por ID",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "integer",
                         "description": "ID de la práctica",
@@ -91,74 +151,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/GetAllusuarios": {
-            "get": {
-                "description": "Recupera todos los registros de usuarios almacenados en la base de datos",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "usuarios"
-                ],
-                "summary": "Obtiene una lista de todos los usuarios",
-                "responses": {
-                    "200": {
-                        "description": "Lista de usuarios obtenida con éxito",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.Usuario"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Error al obtener los usuarios",
-                        "schema": {
-                            "$ref": "#/definitions/auth.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/GetPracticasEmpresas": {
-            "get": {
-                "description": "Recupera las prácticas asociadas a la empresa del usuario autenticado mediante su UID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "practicas"
-                ],
-                "summary": "Obtiene las prácticas de la empresa del usuario autenticado",
-                "responses": {
-                    "200": {
-                        "description": "Lista de prácticas",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.Practica"
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Usuario no autenticado",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "404": {
-                        "description": "Prácticas no encontradas",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/Getpracticas": {
+        "/Get-practicas": {
             "get": {
                 "description": "Recupera la lista completa de todas las prácticas registradas en la base de datos",
                 "consumes": [
@@ -185,6 +178,82 @@ const docTemplate = `{
                         "description": "Error al obtener las prácticas",
                         "schema": {
                             "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/Get-practicas-empresa": {
+            "get": {
+                "description": "Recupera las prácticas asociadas a la empresa del usuario autenticado mediante su UID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "practicas"
+                ],
+                "summary": "Obtiene las prácticas de la empresa del usuario autenticado",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de prácticas",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Practica"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Usuario no autenticado",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Prácticas no encontradas",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/GetAllusuarios": {
+            "get": {
+                "description": "Recupera todos los registros de usuarios almacenados en la base de datos",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "usuarios"
+                ],
+                "summary": "Obtiene una lista de todos los usuarios",
+                "responses": {
+                    "200": {
+                        "description": "Lista de usuarios obtenida con éxito",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Usuario"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error al obtener los usuarios",
+                        "schema": {
+                            "$ref": "#/definitions/auth.ErrorResponse"
                         }
                     }
                 }
@@ -276,7 +345,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/Upgradepracticas/{id}": {
+        "/Update-practicas/{id}": {
             "put": {
                 "description": "Actualiza los detalles de una práctica existente con los datos proporcionados",
                 "consumes": [
@@ -290,6 +359,13 @@ const docTemplate = `{
                 ],
                 "summary": "Actualiza una práctica por su ID",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "string",
                         "description": "ID de la práctica a actualizar",
@@ -361,6 +437,228 @@ const docTemplate = `{
                 }
             }
         },
+        "/comentarios/{id}": {
+            "put": {
+                "description": "Actualiza un comentario específico en la base de datos si el usuario tiene permiso para hacerlo",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Foro"
+                ],
+                "summary": "Actualiza un comentario",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID del comentario a actualizar",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Datos del comentario actualizado",
+                        "name": "comentario",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Comentario"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Comentario actualizado exitosamente",
+                        "schema": {
+                            "$ref": "#/definitions/models.Comentario"
+                        }
+                    },
+                    "400": {
+                        "description": "Datos inválidos",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Usuario no autenticado",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "403": {
+                        "description": "No tienes permiso para actualizar este comentario",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Comentario no encontrado",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Error al actualizar el comentario",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Elimina un comentario existente en un tema. El usuario debe estar autenticado y ser el propietario del comentario.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Foro"
+                ],
+                "summary": "Eliminar un comentario",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID del comentario",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Comentario eliminado exitosamente",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "ID de comentario inválido",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Usuario no autenticado",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "403": {
+                        "description": "No tienes permiso para eliminar este comentario",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Comentario no encontrado",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Error al eliminar el comentario",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/comentarios/{id}/respuesta": {
+            "post": {
+                "description": "Permite a un usuario añadir un comentario o responder a un comentario en un tema. Se puede incluir un comentario padre (respuesta).",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Foro"
+                ],
+                "summary": "Añadir un comentario o respuesta a un tema",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID del tema",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID del comentario padre (opcional)",
+                        "name": "comentario_padre_id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Comentario creado exitosamente",
+                        "schema": {
+                            "$ref": "#/definitions/models.Comentario"
+                        }
+                    },
+                    "400": {
+                        "description": "Error en la solicitud (por ejemplo, ID de tema o comentario inválido)",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Usuario no autenticado",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Error al crear el comentario",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/complete-profile": {
             "post": {
                 "description": "Permite a los usuarios autenticados completar o actualizar su perfil, incluida la foto de perfil",
@@ -420,99 +718,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/login": {
-            "post": {
-                "description": "Autentica al usuario utilizando Firebase y devuelve un token",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "auth"
-                ],
-                "summary": "Inicia sesión un usuario",
-                "parameters": [
-                    {
-                        "description": "Datos de inicio de sesión",
-                        "name": "user",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/auth.LoginRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Inicio de sesión exitoso",
-                        "schema": {
-                            "$ref": "#/definitions/auth.LoginResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Datos inválidos",
-                        "schema": {
-                            "$ref": "#/definitions/auth.ErrorResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Credenciales incorrectas",
-                        "schema": {
-                            "$ref": "#/definitions/auth.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/password-reset": {
-            "post": {
-                "description": "Permite a los usuarios recuperar su contraseña mediante un correo de recuperación",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "password"
-                ],
-                "summary": "Envía un correo de recuperación de contraseña",
-                "parameters": [
-                    {
-                        "description": "Correo del usuario",
-                        "name": "email",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/auth.PasswordResetRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Correo de recuperación enviado con éxito",
-                        "schema": {
-                            "$ref": "#/definitions/auth.SuccessResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Email requerido",
-                        "schema": {
-                            "$ref": "#/definitions/auth.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Error al enviar el correo de recuperación",
-                        "schema": {
-                            "$ref": "#/definitions/auth.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/practicas/filtro": {
+        "/filtro-practicas": {
             "get": {
                 "description": "Filtra las prácticas según los parámetros opcionales como modalidad, área de práctica, jornada, ubicación y fecha de publicación",
                 "consumes": [
@@ -568,6 +774,162 @@ const docTemplate = `{
                         "description": "Error al obtener las prácticas",
                         "schema": {
                             "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/login": {
+            "post": {
+                "description": "Autentica al usuario utilizando Firebase y devuelve un token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Inicia sesión un usuario",
+                "parameters": [
+                    {
+                        "description": "Datos de inicio de sesión",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth.LoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Inicio de sesión exitoso",
+                        "schema": {
+                            "$ref": "#/definitions/auth.LoginResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Datos inválidos",
+                        "schema": {
+                            "$ref": "#/definitions/auth.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Credenciales incorrectas",
+                        "schema": {
+                            "$ref": "#/definitions/auth.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/notificaciones": {
+            "post": {
+                "description": "Esta función procesa la notificación y devuelve un mensaje especificado.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "notificaciones"
+                ],
+                "summary": "Procesar notificación",
+                "parameters": [
+                    {
+                        "description": "Mensaje de la notificación",
+                        "name": "mensaje",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Mensaje procesado",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Datos inválidos",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/notificaciones/test": {
+            "get": {
+                "description": "Devuelve un mensaje de prueba como respuesta",
+                "tags": [
+                    "notificaciones"
+                ],
+                "summary": "Enviar notificación de prueba",
+                "responses": {
+                    "200": {
+                        "description": "Mensaje de prueba enviado correctamente",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/password-reset": {
+            "post": {
+                "description": "Permite a los usuarios recuperar su contraseña mediante un correo de recuperación",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "password"
+                ],
+                "summary": "Envía un correo de recuperación de contraseña",
+                "parameters": [
+                    {
+                        "description": "Correo del usuario",
+                        "name": "email",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth.PasswordResetRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Correo de recuperación enviado con éxito",
+                        "schema": {
+                            "$ref": "#/definitions/auth.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Email requerido",
+                        "schema": {
+                            "$ref": "#/definitions/auth.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Error al enviar el correo de recuperación",
+                        "schema": {
+                            "$ref": "#/definitions/auth.ErrorResponse"
                         }
                     }
                 }
@@ -861,6 +1223,245 @@ const docTemplate = `{
                 }
             }
         },
+        "/temas": {
+            "get": {
+                "description": "Devuelve una lista de todos los temas disponibles. Si no hay temas, devuelve un mensaje indicando que no se encontraron temas.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Foro"
+                ],
+                "summary": "Obtener todos los temas",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de temas",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Tema"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No se encontraron temas",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Error al obtener los temas",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Crea un nuevo tema en el foro. El usuario debe estar autenticado para poder crear un tema.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Foro"
+                ],
+                "summary": "Crear un nuevo tema",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Datos del nuevo tema",
+                        "name": "tema",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Tema"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Tema creado exitosamente",
+                        "schema": {
+                            "$ref": "#/definitions/models.Tema"
+                        }
+                    },
+                    "400": {
+                        "description": "Datos inválidos",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Usuario no autenticado",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Error al crear el tema",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/temas/{id}/comentarios": {
+            "get": {
+                "description": "Devuelve todos los comentarios de un tema específico dado su ID. Si no hay comentarios, devuelve un mensaje indicando que no se encontraron comentarios.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Foro"
+                ],
+                "summary": "Obtener los comentarios de un tema",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID del tema",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de comentarios",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Comentario"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "ID de tema inválido",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "No se encontraron comentarios para este tema",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Error al obtener los comentarios",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Permite a un usuario añadir un comentario a un tema específico. El usuario debe estar autenticado.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Foro"
+                ],
+                "summary": "Añadir un comentario o respuesta a un tema",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID del tema",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Datos del comentario",
+                        "name": "comentario",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Comentario"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Comentario creado exitosamente",
+                        "schema": {
+                            "$ref": "#/definitions/models.Comentario"
+                        }
+                    },
+                    "400": {
+                        "description": "ID de tema inválido o datos inválidos",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Usuario no autenticado",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Error al crear el comentario",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/upload-image": {
             "post": {
                 "description": "Sube una imagen a Firebase Storage y actualiza el campo de foto de perfil del usuario autenticado",
@@ -932,6 +1533,63 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "Crudempresa.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "Crudempresa.SuccessResponse": {
+            "type": "object",
+            "properties": {
+                "id_practica": {
+                    "type": "integer"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "Crudempresa.practicaRequest": {
+            "type": "object",
+            "properties": {
+                "Area_practica": {
+                    "type": "string"
+                },
+                "Descripcion": {
+                    "type": "string"
+                },
+                "Fecha_expiracion": {
+                    "type": "string"
+                },
+                "Fecha_fin": {
+                    "type": "string"
+                },
+                "Fecha_inicio": {
+                    "type": "string"
+                },
+                "Jornada": {
+                    "type": "string"
+                },
+                "Modalidad": {
+                    "type": "string"
+                },
+                "Requisitos": {
+                    "type": "string"
+                },
+                "Titulo": {
+                    "type": "string"
+                },
+                "Ubicacion": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
         "Crudempresa.practicasRequest": {
             "type": "object",
             "properties": {
@@ -1158,6 +1816,29 @@ const docTemplate = `{
                 }
             }
         },
+        "models.Comentario": {
+            "type": "object",
+            "properties": {
+                "comentario_padre_id": {
+                    "type": "integer"
+                },
+                "contenido": {
+                    "type": "string"
+                },
+                "fecha_creacion": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "tema_id": {
+                    "type": "integer"
+                },
+                "usuario_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "models.Practica": {
             "type": "object",
             "properties": {
@@ -1201,6 +1882,27 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.Tema": {
+            "type": "object",
+            "properties": {
+                "descripcion": {
+                    "type": "string"
+                },
+                "fecha_creacion": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "titulo": {
+                    "type": "string"
+                },
+                "usuario_id": {
+                    "description": "Este debería ser el campo donde almacenas el ID del usuario",
                     "type": "integer"
                 }
             }

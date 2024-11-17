@@ -21,7 +21,7 @@ import (
 // @Param fecha_publicacion query string false "Filtrar por mes de publicación (ejemplo: '2024-10')"
 // @Success 200 {string} string "Lista de prácticas filtradas"
 // @Failure 500 {string} string "Error al obtener las prácticas"
-// @Router /practicas/filtro [get]
+// @Router /filtro-practicas [get]
 // FiltroPracticas aplica filtros opcionales a las prácticas y devuelve el resultado
 func FiltroPracticas(c *gin.Context) {
 	// Obtener los parámetros de la solicitud (query parameters)

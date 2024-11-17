@@ -1,14 +1,14 @@
 package database
 
 import (
-	"fmt"
+	//"fmt"
 	"log"
 	"net/http"
 	"net/smtp"
 	"os"
 	"time"
 
-	websocket "practica/websocket"
+	//websocket "practica/websocket"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -42,9 +42,8 @@ func CheckPostulacionForChanges(c *gin.Context, db *gorm.DB) {
 			if err != nil {
 				log.Printf("Error sending email to %s: %v", postulacion.Correo, err)
 			}
-			clienteID := postulacion.IDUsuario
-			msg := "Subject: Cambio en el estado de tu postulación\n\nEl estado de tu postulación ha cambiado a: " + postulacion.NomEstadoPostulacion
-			websocket.NotificarClientes("alguien", fmt.Sprintf("%d", clienteID), msg)
+			//clienteID := postulacion.IDUsuario
+			//msg := "Subject: Cambio en el estado de tu postulación\n\nEl estado de tu postulación ha cambiado a: " + postulacion.NomEstadoPostulacion
 
 			// Actualiza el previo_estado_postulacion al actual estado_postulacion
 			if err := db.Model(&Postulacion{}).

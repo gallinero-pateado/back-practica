@@ -4,14 +4,14 @@ import (
 	"time"
 )
 
-type NotificacionesFront struct {
+type Notificaciones_All struct {
 	Id                 uint      `gorm:"primaryKey;autoIncrement"`
-	Id_mensaje         int       `json:"id_mensaje"`
-	Id_receptor        int       `json:"id_receptor"`
+	Titulo             string    `json:"titulo"`
+	Mensaje            string    `json:"mensaje"`
 	Fecha_hora_mensaje time.Time `json:"default:CURRENT_TIMESTAMP"`
 	Estado             string    `json:"estado"`
 }
 
-func (NotificacionesFront) TableName() string {
-	return "NotificacionesFront"
+func (Notificaciones_All) TableName() string {
+	return "Notificaciones"
 }

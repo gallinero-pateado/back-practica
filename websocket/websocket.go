@@ -1,9 +1,10 @@
 package websocket
 
 import (
+	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
+	"practica/internal/models"
 	"strconv"
 	"sync"
 
@@ -24,18 +25,13 @@ type Cliente struct {
 	Id   uint `json:"id"`
 }
 
-type ComentarioNotificacion struct {
-	Mensaje string `json:"mensaje"`
+func (c *Cliente) WriteJSON(v interface{}) error {
+	return c.Conn.WriteJSON(v)
 }
 
 var Clientes = make(map[string]*Cliente)
-var Broadcast = make(chan MensajeNotificacion)
+var Broadcast = make(chan models.Notificaciones_All)
 var Mutex = &sync.Mutex{}
-
-type MensajeNotificacion struct {
-	ID_remitente string `json:"ID_remitente"`
-	Contenido    string `json:"Contenido"`
-}
 
 func NuevoCliente(Conn *websocket.Conn, ID uint) *Cliente {
 	return &Cliente{
@@ -53,13 +49,31 @@ func Handle_WebSocket() gin.HandlerFunc {
 			return
 		}
 		defer conn.Close()
+
+		// Obtener el ID del usuario desde la query
+		ID_usuario := c.Query("ID_usuario")
+		id, err := strconv.ParseUint(ID_usuario, 10, 64)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		Clientes[fmt.Sprint(id)] = NuevoCliente(conn, uint(id))
+
 		for {
 			mt, mensaje, err := conn.ReadMessage() // Leer el mensaje del cliente
 			if err != nil {                        // Manejar errores
 				fmt.Println(err)
 				return
 			}
-			fmt.Printf("Recibido: %s\n", mensaje)
+
+			var wsNotificacion models.Notificaciones_All
+			if err := json.Unmarshal(mensaje, &wsNotificacion); err != nil {
+				fmt.Println("Error al deserializar mensaje:", err)
+				continue
+			}
+			fmt.Printf("%s: %s\n", wsNotificacion.Titulo, wsNotificacion.Mensaje)
+
 			err = conn.WriteMessage(mt, mensaje)
 			if err != nil {
 				fmt.Println(err)
@@ -68,37 +82,16 @@ func Handle_WebSocket() gin.HandlerFunc {
 		}
 	}
 }
-func NotificarClientes(ID_remitente string, contenido string, ID_cliente string) {
-	id, err := strconv.ParseUint(ID_cliente, 10, 64)
-	if err != nil {
-		log.Printf("error parsing ID_cliente: %v", err)
-		return
-	}
-	mensaje := MensajeNotificacion{Contenido: contenido}
 
-	Mutex.Lock()
-	defer Mutex.Unlock()
-
-	for _, cliente := range Clientes {
-		if cliente.Id == uint(id) {
-			err := cliente.Conn.WriteJSON(mensaje)
+func HandleMessages() {
+	for {
+		msg := <-Broadcast
+		if conn, ok := Clientes[fmt.Sprint(msg.Id)]; ok {
+			err := conn.WriteJSON(msg)
 			if err != nil {
-				log.Printf("error sending message: %v", err)
+				conn.Conn.Close()
+				delete(Clientes, fmt.Sprint(msg.Id))
 			}
 		}
 	}
-}
-
-func BroadcastMessage(c *gin.Context) {
-	var json struct {
-		ID_remitente string `json:"id_remitente"`
-		Contenido    string `json:"contenido"`
-		ID_cliente   string `json:"id_cliente"`
-	}
-	if err := c.ShouldBindJSON(&json); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	NotificarClientes(json.ID_remitente, json.Contenido, json.ID_cliente)
-	c.JSON(http.StatusOK, gin.H{"status": "notificación enviada"})
 }

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	//"fmt"
 	"log"
 
 	//"net/http"
@@ -66,7 +66,7 @@ func main() {
 	// Agregar la ruta de Swagger
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	go func() {
+	/*go func() {
 		for {
 			msg := <-websocket.Broadcast
 			websocket.Mutex.Lock()
@@ -80,8 +80,9 @@ func main() {
 			}
 			websocket.Mutex.Unlock()
 		}
-	}()
+	}()*/
 
+	go websocket.HandleMessages()
 	// Mostrar en consola que el WebSocket está activo
 	log.Println("WebSocket server is active and listening for connections")
 	// Iniciar el servidor

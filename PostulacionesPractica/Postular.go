@@ -9,7 +9,7 @@ import (
 	"practica/internal/models"
 	"time"
 
-	websocket "practica/websocket"
+	//websocket "practica/websocket"
 
 	"github.com/dgrijalva/jwt-go"
 
@@ -156,8 +156,8 @@ func VerifyPostulacionHandler(c *gin.Context) {
 		}
 
 		c.JSON(http.StatusOK, gin.H{"message": "Postulacion verificada exitosamente."})
-		msg := "Se verifico tu postulacion"
-		websocket.NotificarClientes("alguien", fmt.Sprintf("%d", idusuario), msg)
+		//msg := "Se verifico tu postulacion"
+		//websocket.NotificarClientes("alguien", fmt.Sprintf("%d", idusuario), msg)
 
 	} else {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Token inválido o expirado"})

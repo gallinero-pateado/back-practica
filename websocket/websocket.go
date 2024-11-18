@@ -50,8 +50,7 @@ func Handle_WebSocket() gin.HandlerFunc {
 		}
 		defer conn.Close()
 
-		// Obtener el ID del usuario desde la query
-		ID_usuario := c.Query("ID_usuario")
+		ID_usuario := c.Param("ID_usuario")
 		id, err := strconv.ParseUint(ID_usuario, 10, 64)
 		if err != nil {
 			fmt.Println(err)

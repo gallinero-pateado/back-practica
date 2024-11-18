@@ -2,6 +2,7 @@ package database
 
 import (
 	//"fmt"
+	"fmt"
 	"log"
 	"net/http"
 	"net/smtp"
@@ -51,6 +52,92 @@ func CheckPostulacionForChanges(c *gin.Context, db *gorm.DB) {
 				Update("previo_estado_postulacion", postulacion.IDEstadoPostulacion).Error; err != nil {
 				log.Printf("Error updating previo_estado_postulacion for postulacion ID %d: %v", postulacion.ID, err)
 			}
+		}
+	}
+}
+
+func CambiarEstadoPostulacion(c *gin.Context, db *gorm.DB) {
+	for {
+		var postulaciones []Postulacion
+
+		usuarioIdStr := c.Param("usuarioId")
+		if usuarioIdStr == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "ID de práctica no proporcionado"})
+			return
+		}
+
+		// Convertir practicaidStr a int
+		var usuarioId int
+		if _, err := fmt.Sscan(usuarioIdStr, &usuarioId); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "ID de práctica inválido"})
+			return
+		}
+
+		eleccionStr := c.Param("eleccionId")
+		if eleccionStr == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "ID de práctica no proporcionado"})
+			return
+		}
+
+		// Convertir practicaidStr a int
+		var eleccionId int
+		if _, err := fmt.Sscan(eleccionStr, &eleccionId); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "ID de práctica inválido"})
+			return
+		}
+
+		postulacionidStr := c.Param("postulacionid")
+		if postulacionidStr == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "ID de práctica no proporcionado"})
+			return
+		}
+
+		// Convertir practicaidStr a int
+		var postulacionid int
+		if _, err := fmt.Sscan(postulacionidStr, &postulacionid); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "ID de práctica inválido"})
+			return
+		}
+
+		// Chequea si existe una postulacion para el usuario y la practica
+		if err := db.Table("postulacion").
+			Select(`postulacion.*, "Usuario".correo, estado_postulacion.nom_estado_postulacion`).
+			Joins(`left join "Usuario" on postulacion.id_usuario = "Usuario".id`).
+			Joins("left join estado_postulacion on postulacion.id_estado_postulacion = estado_postulacion.id_estado_postulacion").
+			Where("postulacion.id_usuario = ? AND postulacion.id = ?", usuarioId, postulacionid).
+			Find(&postulaciones).Error; err != nil {
+			log.Fatalf("Error querying the database: %v", err)
+		}
+
+		for _, postulacion := range postulaciones {
+			//Guarda el estado anterior
+			if err := db.Model(&Postulacion{}).
+				Where("id = ?", postulacion.ID).
+				Update("previo_estado_postulacion", postulacion.IDEstadoPostulacion).Error; err != nil {
+				log.Printf("Error updating previo_estado_postulacion for postulacion ID %d: %v", postulacion.ID, err)
+			}
+
+			if eleccionId == 2 {
+				postulacion.IDEstadoPostulacion = 2
+			} else if eleccionId == 3 {
+				postulacion.IDEstadoPostulacion = 3
+			}
+			// Actualiza el estado_postulacion al estado actualizado
+			if err := db.Model(&Postulacion{}).
+				Where("id = ?", postulacion.ID).
+				Update("estado_postulacion", postulacion.IDEstadoPostulacion).Error; err != nil {
+				log.Printf("Error actualizando previo_estado_postulacion en postulacion ID %d: %v", postulacion.ID, err)
+			}
+
+			// Send email to the user
+			err := SendEmail(postulacion.Correo, postulacion.NomEstadoPostulacion)
+			if err != nil {
+				log.Printf("Error sending email to %s: %v", postulacion.Correo, err)
+			}
+			//clienteID := postulacion.IDUsuario
+			//msg := "Subject: Cambio en el estado de tu postulación\n\nEl estado de tu postulación ha cambiado a: " + postulacion.NomEstadoPostulacion
+
+			// Actualiza el previo_estado_postulacion al actual estado_postulacion
 		}
 	}
 }

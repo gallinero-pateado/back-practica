@@ -71,7 +71,7 @@ func SetupRoutes() *gin.Engine {
 	router.GET("/check-postulaciones", database.CheckPostulacionForChangesHandler)
 	router.GET("/Check-NuevoPostulanteForChanges", database.CheckNuevoPostulanteForChangesHandler)
 
-	router.GET("/ws/:id", websocket.Handle_WebSocket())
+	router.GET("/ws", websocket.Handle_WebSocket())
 	router.POST("/notificar/:id", notificaciones.NotificarNuevoHilo)
 	return router
 }

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"practica/internal/models"
-	"strconv"
 	"sync"
 
 	"github.com/gin-gonic/gin"
@@ -21,63 +20,67 @@ var upgrader = websocket.Upgrader{
 }
 
 type Cliente struct {
-	Conn *websocket.Conn
-	Id   uint `json:"id"`
+	conn        *websocket.Conn
+	temas       map[string]bool
+	comentarios map[string]bool
 }
 
 func (c *Cliente) WriteJSON(v interface{}) error {
-	return c.Conn.WriteJSON(v)
+	return c.conn.WriteJSON(v)
 }
 
-var Clientes = make(map[string]*Cliente)
+var clientes = make(map[string]*Cliente)
 var Broadcast = make(chan models.Notificaciones_All)
-var Mutex = &sync.Mutex{}
-
-func NuevoCliente(Conn *websocket.Conn, ID uint) *Cliente {
-	return &Cliente{
-		Conn: Conn,
-		Id:   ID,
-	}
-}
+var clientesMutex = &sync.Mutex{}
 
 func Handle_WebSocket() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Obtener la ID del usuario desde la URL
+		ID_usuario := c.Query("ID_usuario")
+		if ID_usuario == "" {
+			fmt.Println("Error: ID_usuario está vacío")
+			return
+		}
+
 		conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println("Error al establecer WebSocket:", err)
 			return
 		}
 		defer conn.Close()
 
-		ID_usuario := c.Param("ID_usuario")
-		id, err := strconv.ParseUint(ID_usuario, 10, 64)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-
-		Clientes[fmt.Sprint(id)] = NuevoCliente(conn, uint(id))
+		clientesMutex.Lock()
+		clientes[ID_usuario] = &Cliente{conn: conn, temas: make(map[string]bool), comentarios: make(map[string]bool)}
+		clientesMutex.Unlock()
 
 		for {
-			mt, mensaje, err := conn.ReadMessage() // Leer el mensaje del cliente
-			if err != nil {                        // Manejar errores
-				fmt.Println(err)
+			_, mensaje, err := conn.ReadMessage()
+			if err != nil {
+				fmt.Println("Error al leer mensaje WebSocket:", err)
+				clientesMutex.Lock()
+				delete(clientes, ID_usuario)
+				clientesMutex.Unlock()
 				return
 			}
 
-			var wsNotificacion models.Notificaciones_All
-			if err := json.Unmarshal(mensaje, &wsNotificacion); err != nil {
+			var notificacion models.Notificaciones_All
+			if err := json.Unmarshal(mensaje, &notificacion); err != nil {
 				fmt.Println("Error al deserializar mensaje:", err)
 				continue
 			}
-			fmt.Printf("%s: %s\n", wsNotificacion.Titulo, wsNotificacion.Mensaje)
 
-			err = conn.WriteMessage(mt, mensaje)
-			if err != nil {
-				fmt.Println(err)
-				return
+			if notificacion.Titulo != "" {
+				clientesMutex.Lock()
+				clientes[ID_usuario].temas[notificacion.Titulo] = true
+				clientesMutex.Unlock()
 			}
+
+			if notificacion.Mensaje != "" {
+				clientesMutex.Lock()
+				clientes[ID_usuario].comentarios[notificacion.Mensaje] = true
+				clientesMutex.Unlock()
+			}
+
+			fmt.Printf("%s: %s\n", notificacion.Titulo, notificacion.Mensaje)
 		}
 	}
 }
@@ -85,11 +88,27 @@ func Handle_WebSocket() gin.HandlerFunc {
 func HandleMessages() {
 	for {
 		msg := <-Broadcast
-		if conn, ok := Clientes[fmt.Sprint(msg.Id)]; ok {
-			err := conn.WriteJSON(msg)
+		clientesMutex.Lock()
+		for _, cliente := range clientes {
+			err := cliente.conn.WriteJSON(msg)
 			if err != nil {
-				conn.Conn.Close()
-				delete(Clientes, fmt.Sprint(msg.Id))
+				cliente.conn.Close()
+				delete(clientes, fmt.Sprint(msg.Id))
+			}
+		}
+		clientesMutex.Unlock()
+	}
+}
+
+func EnviarMensajeATemaOComentario(tema string, comentario string, mensaje models.Notificaciones_All) {
+	clientesMutex.Lock()
+	defer clientesMutex.Unlock()
+
+	for _, cliente := range clientes {
+		if cliente.temas[tema] || cliente.comentarios[comentario] {
+			err := cliente.conn.WriteJSON(mensaje)
+			if err != nil {
+				fmt.Println("Error al enviar mensaje:", err)
 			}
 		}
 	}

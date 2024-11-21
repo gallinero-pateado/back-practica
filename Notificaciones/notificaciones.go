@@ -55,18 +55,16 @@ func NotificarNuevoHilo(c *gin.Context) {
 		}
 	}
 
-	for _, comentario := range Comentarios {
-		for _, usuario := range seguidores {
-			notificacion := models.Notificaciones_All{
-				Id:                 usuario.Id,
-				Titulo:             "Nuevo comentario",
-				Mensaje:            fmt.Sprintf("Nuevo comentario en el hilo que sigues: %s", Tema.Titulo),
-				Fecha_hora_mensaje: time.Now(),
-				Estado:             "Enviado",
-			}
-			Notificaciones = append(Notificaciones, notificacion)
-			websocket.EnviarMensajeATemaOComentario(Tema.Titulo, fmt.Sprint(comentario.Comentario_padre_id), notificacion)
+	for _, usuario := range seguidores {
+		notificacion := models.Notificaciones_All{
+			Id:                 usuario.Id,
+			Titulo:             "Nuevo comentario",
+			Mensaje:            fmt.Sprintf("Nuevo comentario en el hilo que sigues: %s", Tema.Titulo),
+			Fecha_hora_mensaje: time.Now(),
+			Estado:             "Enviado",
 		}
+		Notificaciones = append(Notificaciones, notificacion)
+		websocket.EnviarMensajeATemaOComentario(notificacion)
 	}
 
 	for _, comentario := range Comentarios {

@@ -14,10 +14,11 @@ import (
 // @Tags practicas
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "Bearer token"
 // @Success 200 {array} models.Practica "Lista de prácticas"
 // @Failure 401 {string} string "Usuario no autenticado"
 // @Failure 404 {string} string "Prácticas no encontradas"
-// @Router /GetPracticasEmpresas [get]
+// @Router /Get-practicas-empresa [get]
 func GetPracticasEmpresas(c *gin.Context) {
 	var practicas []models.Practica
 

@@ -1,4 +1,41 @@
 definitions:
+  Crudempresa.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  Crudempresa.SuccessResponse:
+    properties:
+      id_practica:
+        type: integer
+      message:
+        type: string
+    type: object
+  Crudempresa.practicaRequest:
+    properties:
+      Area_practica:
+        type: string
+      Descripcion:
+        type: string
+      Fecha_expiracion:
+        type: string
+      Fecha_fin:
+        type: string
+      Fecha_inicio:
+        type: string
+      Jornada:
+        type: string
+      Modalidad:
+        type: string
+      Requisitos:
+        type: string
+      Titulo:
+        type: string
+      Ubicacion:
+        type: string
+      id:
+        type: integer
+    type: object
   Crudempresa.practicasRequest:
     properties:
       Area_practica:
@@ -147,6 +184,21 @@ definitions:
       error:
         type: string
     type: object
+  models.Comentario:
+    properties:
+      comentario_padre_id:
+        type: integer
+      contenido:
+        type: string
+      fecha_creacion:
+        type: string
+      id:
+        type: integer
+      tema_id:
+        type: integer
+      usuario_id:
+        type: integer
+    type: object
   models.Practica:
     properties:
       Area_practica:
@@ -176,6 +228,20 @@ definitions:
       fecha_publicacion:
         type: string
       id:
+        type: integer
+    type: object
+  models.Tema:
+    properties:
+      descripcion:
+        type: string
+      fecha_creacion:
+        type: string
+      id:
+        type: integer
+      titulo:
+        type: string
+      usuario_id:
+        description: Este debería ser el campo donde almacenas el ID del usuario
         type: integer
     type: object
   models.Usuario:
@@ -228,13 +294,54 @@ paths:
       summary: Verificar cambios en la tabla de postulaciones
       tags:
       - postulaciones
-  /Deletepracticas/{id}:
+  /Create-practicas:
+    post:
+      consumes:
+      - application/json
+      description: Crea una oferta de práctica basada en los datos proporcionados
+        y la guarda en la base de datos
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Datos de la nueva práctica
+        in: body
+        name: practica
+        required: true
+        schema:
+          $ref: '#/definitions/Crudempresa.practicaRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Oferta de práctica creada exitosamente con el ID de la práctica
+          schema:
+            $ref: '#/definitions/Crudempresa.SuccessResponse'
+        "400":
+          description: Datos inválidos
+          schema:
+            $ref: '#/definitions/Crudempresa.ErrorResponse'
+        "500":
+          description: Error al guardar la práctica en la base de datos
+          schema:
+            $ref: '#/definitions/Crudempresa.ErrorResponse'
+      summary: Crea una nueva oferta de práctica
+      tags:
+      - practicas
+  /Delete-practica/{id}:
     delete:
       consumes:
       - application/json
       description: Elimina una práctica específica de la base de datos utilizando
         su ID
       parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: ID de la práctica
         in: path
         name: id
@@ -262,53 +369,7 @@ paths:
       summary: Elimina una práctica por ID
       tags:
       - practicas
-  /GetAllusuarios:
-    get:
-      description: Recupera todos los registros de usuarios almacenados en la base
-        de datos
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Lista de usuarios obtenida con éxito
-          schema:
-            items:
-              $ref: '#/definitions/models.Usuario'
-            type: array
-        "500":
-          description: Error al obtener los usuarios
-          schema:
-            $ref: '#/definitions/auth.ErrorResponse'
-      summary: Obtiene una lista de todos los usuarios
-      tags:
-      - usuarios
-  /GetPracticasEmpresas:
-    get:
-      consumes:
-      - application/json
-      description: Recupera las prácticas asociadas a la empresa del usuario autenticado
-        mediante su UID
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Lista de prácticas
-          schema:
-            items:
-              $ref: '#/definitions/models.Practica'
-            type: array
-        "401":
-          description: Usuario no autenticado
-          schema:
-            type: string
-        "404":
-          description: Prácticas no encontradas
-          schema:
-            type: string
-      summary: Obtiene las prácticas de la empresa del usuario autenticado
-      tags:
-      - practicas
-  /Getpracticas:
+  /Get-practicas:
     get:
       consumes:
       - application/json
@@ -330,6 +391,58 @@ paths:
       summary: Obtiene todas las prácticas
       tags:
       - practicas
+  /Get-practicas-empresa:
+    get:
+      consumes:
+      - application/json
+      description: Recupera las prácticas asociadas a la empresa del usuario autenticado
+        mediante su UID
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Lista de prácticas
+          schema:
+            items:
+              $ref: '#/definitions/models.Practica'
+            type: array
+        "401":
+          description: Usuario no autenticado
+          schema:
+            type: string
+        "404":
+          description: Prácticas no encontradas
+          schema:
+            type: string
+      summary: Obtiene las prácticas de la empresa del usuario autenticado
+      tags:
+      - practicas
+  /GetAllusuarios:
+    get:
+      description: Recupera todos los registros de usuarios almacenados en la base
+        de datos
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Lista de usuarios obtenida con éxito
+          schema:
+            items:
+              $ref: '#/definitions/models.Usuario'
+            type: array
+        "500":
+          description: Error al obtener los usuarios
+          schema:
+            $ref: '#/definitions/auth.ErrorResponse'
+      summary: Obtiene una lista de todos los usuarios
+      tags:
+      - usuarios
   /Getusuario/{uid}:
     get:
       description: Recupera la información de un usuario de la base de datos utilizando
@@ -388,13 +501,18 @@ paths:
       summary: Send an email notification
       tags:
       - email
-  /Upgradepracticas/{id}:
+  /Update-practicas/{id}:
     put:
       consumes:
       - application/json
       description: Actualiza los detalles de una práctica existente con los datos
         proporcionados
       parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: ID de la práctica a actualizar
         in: path
         name: id
@@ -446,6 +564,163 @@ paths:
       summary: Verificar cambios en la tabla de postulaciones
       tags:
       - postulaciones
+  /comentarios/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Elimina un comentario existente en un tema. El usuario debe estar
+        autenticado y ser el propietario del comentario.
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: ID del comentario
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Comentario eliminado exitosamente
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: ID de comentario inválido
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Usuario no autenticado
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: No tienes permiso para eliminar este comentario
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Comentario no encontrado
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Error al eliminar el comentario
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Eliminar un comentario
+      tags:
+      - Foro
+    put:
+      consumes:
+      - application/json
+      description: Actualiza un comentario específico en la base de datos si el usuario
+        tiene permiso para hacerlo
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: ID del comentario a actualizar
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Datos del comentario actualizado
+        in: body
+        name: comentario
+        required: true
+        schema:
+          $ref: '#/definitions/models.Comentario'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Comentario actualizado exitosamente
+          schema:
+            $ref: '#/definitions/models.Comentario'
+        "400":
+          description: Datos inválidos
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Usuario no autenticado
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: No tienes permiso para actualizar este comentario
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Comentario no encontrado
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Error al actualizar el comentario
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Actualiza un comentario
+      tags:
+      - Foro
+  /comentarios/{id}/respuesta:
+    post:
+      consumes:
+      - application/json
+      description: Permite a un usuario añadir un comentario o responder a un comentario
+        en un tema. Se puede incluir un comentario padre (respuesta).
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: ID del tema
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: ID del comentario padre (opcional)
+        in: query
+        name: comentario_padre_id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Comentario creado exitosamente
+          schema:
+            $ref: '#/definitions/models.Comentario'
+        "400":
+          description: Error en la solicitud (por ejemplo, ID de tema o comentario
+            inválido)
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Usuario no autenticado
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Error al crear el comentario
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Añadir un comentario o respuesta a un tema
+      tags:
+      - Foro
   /complete-profile:
     post:
       consumes:
@@ -486,68 +761,7 @@ paths:
       summary: Completar o actualizar perfil de usuario
       tags:
       - profile
-  /login:
-    post:
-      consumes:
-      - application/json
-      description: Autentica al usuario utilizando Firebase y devuelve un token
-      parameters:
-      - description: Datos de inicio de sesión
-        in: body
-        name: user
-        required: true
-        schema:
-          $ref: '#/definitions/auth.LoginRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Inicio de sesión exitoso
-          schema:
-            $ref: '#/definitions/auth.LoginResponse'
-        "400":
-          description: Datos inválidos
-          schema:
-            $ref: '#/definitions/auth.ErrorResponse'
-        "401":
-          description: Credenciales incorrectas
-          schema:
-            $ref: '#/definitions/auth.ErrorResponse'
-      summary: Inicia sesión un usuario
-      tags:
-      - auth
-  /password-reset:
-    post:
-      consumes:
-      - application/json
-      description: Permite a los usuarios recuperar su contraseña mediante un correo
-        de recuperación
-      parameters:
-      - description: Correo del usuario
-        in: body
-        name: email
-        required: true
-        schema:
-          $ref: '#/definitions/auth.PasswordResetRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Correo de recuperación enviado con éxito
-          schema:
-            $ref: '#/definitions/auth.SuccessResponse'
-        "400":
-          description: Email requerido
-          schema:
-            $ref: '#/definitions/auth.ErrorResponse'
-        "500":
-          description: Error al enviar el correo de recuperación
-          schema:
-            $ref: '#/definitions/auth.ErrorResponse'
-      summary: Envía un correo de recuperación de contraseña
-      tags:
-      - password
-  /practicas/filtro:
+  /filtro-practicas:
     get:
       consumes:
       - application/json
@@ -588,6 +802,109 @@ paths:
       summary: Filtra las prácticas
       tags:
       - practicas
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Autentica al usuario utilizando Firebase y devuelve un token
+      parameters:
+      - description: Datos de inicio de sesión
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/auth.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Inicio de sesión exitoso
+          schema:
+            $ref: '#/definitions/auth.LoginResponse'
+        "400":
+          description: Datos inválidos
+          schema:
+            $ref: '#/definitions/auth.ErrorResponse'
+        "401":
+          description: Credenciales incorrectas
+          schema:
+            $ref: '#/definitions/auth.ErrorResponse'
+      summary: Inicia sesión un usuario
+      tags:
+      - auth
+  /notificaciones:
+    post:
+      consumes:
+      - application/json
+      description: Esta función procesa la notificación y devuelve un mensaje especificado.
+      parameters:
+      - description: Mensaje de la notificación
+        in: body
+        name: mensaje
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Mensaje procesado
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Datos inválidos
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Procesar notificación
+      tags:
+      - notificaciones
+  /notificaciones/test:
+    get:
+      description: Devuelve un mensaje de prueba como respuesta
+      responses:
+        "200":
+          description: Mensaje de prueba enviado correctamente
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Enviar notificación de prueba
+      tags:
+      - notificaciones
+  /password-reset:
+    post:
+      consumes:
+      - application/json
+      description: Permite a los usuarios recuperar su contraseña mediante un correo
+        de recuperación
+      parameters:
+      - description: Correo del usuario
+        in: body
+        name: email
+        required: true
+        schema:
+          $ref: '#/definitions/auth.PasswordResetRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Correo de recuperación enviado con éxito
+          schema:
+            $ref: '#/definitions/auth.SuccessResponse'
+        "400":
+          description: Email requerido
+          schema:
+            $ref: '#/definitions/auth.ErrorResponse'
+        "500":
+          description: Error al enviar el correo de recuperación
+          schema:
+            $ref: '#/definitions/auth.ErrorResponse'
+      summary: Envía un correo de recuperación de contraseña
+      tags:
+      - password
   /profile-status:
     get:
       description: Retorna si el perfil ha sido completado o no
@@ -780,6 +1097,174 @@ paths:
       summary: Send an email notification
       tags:
       - email
+  /temas:
+    get:
+      consumes:
+      - application/json
+      description: Devuelve una lista de todos los temas disponibles. Si no hay temas,
+        devuelve un mensaje indicando que no se encontraron temas.
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Lista de temas
+          schema:
+            items:
+              $ref: '#/definitions/models.Tema'
+            type: array
+        "404":
+          description: No se encontraron temas
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Error al obtener los temas
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Obtener todos los temas
+      tags:
+      - Foro
+    post:
+      consumes:
+      - application/json
+      description: Crea un nuevo tema en el foro. El usuario debe estar autenticado
+        para poder crear un tema.
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Datos del nuevo tema
+        in: body
+        name: tema
+        required: true
+        schema:
+          $ref: '#/definitions/models.Tema'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Tema creado exitosamente
+          schema:
+            $ref: '#/definitions/models.Tema'
+        "400":
+          description: Datos inválidos
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Usuario no autenticado
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Error al crear el tema
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Crear un nuevo tema
+      tags:
+      - Foro
+  /temas/{id}/comentarios:
+    get:
+      consumes:
+      - application/json
+      description: Devuelve todos los comentarios de un tema específico dado su ID.
+        Si no hay comentarios, devuelve un mensaje indicando que no se encontraron
+        comentarios.
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: ID del tema
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Lista de comentarios
+          schema:
+            items:
+              $ref: '#/definitions/models.Comentario'
+            type: array
+        "400":
+          description: ID de tema inválido
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: No se encontraron comentarios para este tema
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Error al obtener los comentarios
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Obtener los comentarios de un tema
+      tags:
+      - Foro
+    post:
+      consumes:
+      - application/json
+      description: Permite a un usuario añadir un comentario a un tema específico.
+        El usuario debe estar autenticado.
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: ID del tema
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Datos del comentario
+        in: body
+        name: comentario
+        required: true
+        schema:
+          $ref: '#/definitions/models.Comentario'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Comentario creado exitosamente
+          schema:
+            $ref: '#/definitions/models.Comentario'
+        "400":
+          description: ID de tema inválido o datos inválidos
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Usuario no autenticado
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Error al crear el comentario
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Añadir un comentario o respuesta a un tema
+      tags:
+      - Foro
   /upload-image:
     post:
       consumes:

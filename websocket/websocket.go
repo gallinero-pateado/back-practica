@@ -126,13 +126,23 @@ func CargarSuscripcionesCliente(ID_usuario string) (*Cliente, error) {
 	var temas []models.Tema
 	var comentarios []models.Comentario
 
+	// Buscar el usuario por el uid de Firebase
+	var usuario models.Usuario
+	result := database.DB.Where("firebase_usuario = ?", ID_usuario).Take(&usuario)
+	if result.Error != nil {
+		return nil, fmt.Errorf("error al buscar el usuario en la base de datos: %v", result.Error)
+	}
+
+	// Guardar el ID del usuario en una variable
+	idUsuario := usuario.Id // idUsuario es de tipo uint
+
 	// Obtener los temas en los que ha participado el usuario
-	if err := database.DB.Where("usuario_id = ?", ID_usuario).Find(&temas).Error; err != nil {
+	if err := database.DB.Where("usuario_id = ?", idUsuario).Find(&temas).Error; err != nil {
 		return nil, err
 	}
 
 	// Obtener los comentarios en los que ha participado el usuario
-	if err := database.DB.Where("usuario_id = ?", ID_usuario).Find(&comentarios).Error; err != nil {
+	if err := database.DB.Where("usuario_id = ?", idUsuario).Find(&comentarios).Error; err != nil {
 		return nil, err
 	}
 

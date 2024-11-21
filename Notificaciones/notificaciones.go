@@ -49,7 +49,7 @@ func NotificarNuevoHilo(c *gin.Context) {
 	var seguidores []models.Usuario
 	for _, comentario := range Comentarios {
 		// Obtener los usuarios que siguen el hilo
-		if err := database.DB.Where("comentario_padre_id = ?", comentario.Comentario_padre_id).Find(&seguidores).Error; err != nil {
+		if err := database.DB.Where("comentario_padre_id = ?", comentario.ComentarioPadreID).Find(&seguidores).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}

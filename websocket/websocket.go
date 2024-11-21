@@ -157,5 +157,8 @@ func ObtenerComentarioPadreID(comentarioID uint) (uint, error) {
 	if err := database.DB.First(&comentario, comentarioID).Error; err != nil {
 		return 0, err
 	}
-	return comentario.Comentario_padre_id, nil
+	if comentario.ComentarioPadreID == nil {
+		return 0, fmt.Errorf("ComentarioPadreID is nil")
+	}
+	return *comentario.ComentarioPadreID, nil
 }

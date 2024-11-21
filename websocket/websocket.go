@@ -132,12 +132,16 @@ func CargarSuscripcionesCliente(ID_usuario string) (*Cliente, error) {
 		log.Fatalf("Error: %v", err)
 	}
 	// Obtener los temas en los que ha participado el usuario
-	if err := database.DB.Where("usuario_id = ?", idUsuario).Find(&temas).Error; err != nil {
+	// Obtener los temas en los que ha participado el usuario
+	if err := database.DB.Table("Tema").Select("Tema.*").Joins("JOIN comentarios ON comentarios.tema_id = Tema.id").
+		Where("comentarios.usuario_id = ?", idUsuario).
+		Find(&temas).Error; err != nil {
 		return nil, err
 	}
 
 	// Obtener los comentarios en los que ha participado el usuario
-	if err := database.DB.Where("usuario_id = ?", idUsuario).Find(&comentarios).Error; err != nil {
+	if err := database.DB.Where("usuario_id = ?", idUsuario).
+		Find(&comentarios).Error; err != nil {
 		return nil, err
 	}
 

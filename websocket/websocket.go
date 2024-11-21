@@ -3,6 +3,7 @@ package websocket
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"practica/internal/database"
 	"practica/internal/models"
@@ -126,16 +127,10 @@ func CargarSuscripcionesCliente(ID_usuario string) (*Cliente, error) {
 	var temas []models.Tema
 	var comentarios []models.Comentario
 
-	// Buscar el usuario por el uid de Firebase
-	var usuario models.Usuario
-	result := database.DB.Where("firebase_usuario = ?", ID_usuario).Take(&usuario)
-	if result.Error != nil {
-		return nil, fmt.Errorf("error al buscar el usuario en la base de datos: %v", result.Error)
+	idUsuario, err := buscarUsuario(ID_usuario)
+	if err != nil {
+		log.Fatalf("Error: %v", err)
 	}
-
-	// Guardar el ID del usuario en una variable
-	idUsuario := usuario.Id // idUsuario es de tipo uint
-
 	// Obtener los temas en los que ha participado el usuario
 	if err := database.DB.Where("usuario_id = ?", idUsuario).Find(&temas).Error; err != nil {
 		return nil, err
@@ -171,4 +166,13 @@ func ObtenerComentarioPadreID(comentarioID uint) (uint, error) {
 		return 0, fmt.Errorf("ComentarioPadreID is nil")
 	}
 	return *comentario.ComentarioPadreID, nil
+}
+
+func buscarUsuario(ID_usuario string) (*models.Usuario, error) {
+	var usuarioF models.Usuario
+	result := database.DB.Where("firebase_usuario = ?", ID_usuario).Take(&usuarioF)
+	if result.Error != nil {
+		return nil, fmt.Errorf("error al buscar el usuario en la base de datos: %v", result.Error)
+	}
+	return &usuarioF, nil
 }

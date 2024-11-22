@@ -133,8 +133,8 @@ func CargarSuscripcionesCliente(ID_usuario string) (*Cliente, error) {
 	}
 	// Obtener los temas en los que ha participado el usuario
 	// Obtener los temas en los que ha participado el usuario
-	if err := database.DB.Table("Tema").Select("Tema.*").Joins("JOIN comentario ON comentario.tema_id = Tema.id").
-		Where("comentario.usuario_id = ?", usuarioF).
+	if err := database.DB.Table("Tema").Select("Tema.*").Joins("JOIN Comentario ON Comentario.tema_id = Tema.id").
+		Where("Comentario.usuario_id = ?", usuarioF).
 		Find(&temas).Error; err != nil {
 		return nil, err
 	}

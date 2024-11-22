@@ -14,7 +14,7 @@ var DB *gorm.DB
 // InitDatabase inicializa la conexión con la base de datos
 func InitDatabase() error {
 	// Construir la URL de conexión a PostgreSQL
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=require disable_prepared_statements=false",
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=require disable_prepared_statements=true",
 		os.Getenv("SUPABASE_HOST"),
 		os.Getenv("SUPABASE_USER"),
 		os.Getenv("SUPABASE_PASSWORD"),

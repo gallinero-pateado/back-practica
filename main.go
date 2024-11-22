@@ -4,6 +4,8 @@ import (
 	//"fmt"
 	"log"
 
+	"gorm.io/gorm"
+
 	//"net/http"
 	"practica/api"
 	"practica/internal/auth"
@@ -35,7 +37,9 @@ func main() {
 	// Realizar la migración de la tabla fuera de la transacción
 	if !database.DB.Migrator().HasTable(&models.Usuario{}) {
 		err = database.DB.AutoMigrate(&models.Usuario{})
-		if err != nil {
+
+		Session := database.DB.Session(&gorm.Session{PrepareStmt: true})
+		if Session != nil {
 			log.Fatalf("Error al migrar modelos: %v", err)
 		}
 	}
@@ -43,7 +47,9 @@ func main() {
 	// Realizar la migración de la tabla fuera de la transacción
 	if !database.DB.Migrator().HasTable(&models.Usuario_empresa{}) {
 		err = database.DB.AutoMigrate(&models.Usuario_empresa{})
-		if err != nil {
+
+		Session := database.DB.Session(&gorm.Session{PrepareStmt: true})
+		if Session != nil {
 			log.Fatalf("Error al migrar modelos: %v", err)
 		}
 	}

@@ -3,7 +3,6 @@ package websocket
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"practica/internal/database"
 	"practica/internal/models"
@@ -127,20 +126,21 @@ func CargarSuscripcionesCliente(ID_usuario string) (*Cliente, error) {
 	var temas []models.Tema
 	var comentarios []models.Comentario
 
-	idUsuario, err := buscarUsuario(ID_usuario)
-	if err != nil {
-		log.Fatalf("Error: %v", err)
+	var usuarioF models.Usuario
+	result := database.DB.Where("firebase_usuario = ?", ID_usuario).Take(&usuarioF)
+	if result.Error != nil {
+		return nil, fmt.Errorf("error al buscar el usuario en la base de datos: %v", result.Error)
 	}
 	// Obtener los temas en los que ha participado el usuario
 	// Obtener los temas en los que ha participado el usuario
 	if err := database.DB.Table("Tema").Select("Tema.*").Joins("JOIN comentarios ON comentarios.tema_id = Tema.id").
-		Where("comentario.usuario_id = ?", idUsuario).
+		Where("comentario.usuario_id = ?", usuarioF).
 		Find(&temas).Error; err != nil {
 		return nil, err
 	}
 
 	// Obtener los comentarios en los que ha participado el usuario
-	if err := database.DB.Where("usuario_id = ?", idUsuario).
+	if err := database.DB.Where("usuario_id = ?", usuarioF).
 		Find(&comentarios).Error; err != nil {
 		return nil, err
 	}

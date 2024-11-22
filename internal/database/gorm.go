@@ -7,6 +7,7 @@ import (
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 var DB *gorm.DB
@@ -22,7 +23,10 @@ func InitDatabase() error {
 		os.Getenv("SUPABASE_PORT"))
 
 	// Conectar a la base de datos
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		Logger:      logger.Default.LogMode(logger.Info),
+		PrepareStmt: true,
+	})
 	if err != nil {
 		log.Fatalf("Error al conectar a la base de datos: %v", err)
 		return err
@@ -32,6 +36,7 @@ func InitDatabase() error {
 	db.Exec("DEALLOCATE ALL")
 
 	DB = db
+	db.Logger = logger.Default.LogMode(logger.Info)
 	log.Println("Conexión a la base de datos exitosa con GORM")
 	return nil
 }

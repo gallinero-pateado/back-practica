@@ -718,6 +718,65 @@ const docTemplate = `{
                 }
             }
         },
+        "/complete-profile/empresa": {
+            "post": {
+                "description": "Permite a los usuarios autenticados completar o actualizar su perfil de empresa",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "profile"
+                ],
+                "summary": "Completar o actualizar perfil de usuario empresa",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Datos para actualizar el perfil",
+                        "name": "profile",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth.ProfileUpdateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Perfil actualizado correctamente",
+                        "schema": {
+                            "$ref": "#/definitions/auth.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Datos inválidos",
+                        "schema": {
+                            "$ref": "#/definitions/auth.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Usuario no autenticado",
+                        "schema": {
+                            "$ref": "#/definitions/auth.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Error al actualizar el perfil",
+                        "schema": {
+                            "$ref": "#/definitions/auth.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/filtro-practicas": {
             "get": {
                 "description": "Filtra las prácticas según los parámetros opcionales como modalidad, área de práctica, jornada, ubicación y fecha de publicación",
@@ -1584,9 +1643,6 @@ const docTemplate = `{
                 },
                 "Ubicacion": {
                     "type": "string"
-                },
-                "id": {
-                    "type": "integer"
                 }
             }
         },
@@ -1938,9 +1994,6 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "Rol": {
-                    "type": "string"
-                },
-                "fecha_creacion": {
                     "type": "string"
                 },
                 "firebase_usuario": {

@@ -11,7 +11,6 @@ import (
 
 // practicaRequest representa la estructura de los datos recibidos para crear una nueva práctica
 type practicaRequest struct {
-	Id               int       `gorm:"primaryKey;autoIncrement"`
 	Titulo           string    `json:"Titulo"`
 	Descripcion      string    `json:"Descripcion"`
 	Ubicacion        string    `json:"Ubicacion"`

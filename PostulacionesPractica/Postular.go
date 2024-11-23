@@ -3,18 +3,14 @@ package PostulacionesPractica
 import (
 	"fmt"
 	"net/http"
-	"net/smtp"
-	"os"
 	"practica/internal/database"
 	"practica/internal/models"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
-
 	"github.com/gin-gonic/gin"
 )
 
-var secretKey = []byte(os.Getenv("JWT_SECRET_KEY"))
+//var secretKey = []byte(os.Getenv("JWT_SECRET_KEY"))
 
 type PostulacionRequest struct {
 	Mensaje string `json:"mensaje"` // Campo para el mensaje del usuario
@@ -78,17 +74,17 @@ func Postularpractica(c *gin.Context) {
 		Id_practica:           practicaid,
 	}
 	// Generar un token verificador
-	token, err := GenerateVerificationToken(usuario.Correo, uint(postulacion.Id_practica), int(usuario.Id))
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al generar el token de verificación"})
-		return
-	}
+	//	token, err := GenerateVerificationToken(usuario.Correo, uint(postulacion.Id_practica), int(usuario.Id))
+	//	if err != nil {
+	//		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al generar el token de verificación"})
+	//		return
+	//	}
 
 	// Enviar el correo de verificación
-	if err := SendVerificationEmail(usuario.Correo, token); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al enviar el correo de verificación"})
-		return
-	}
+	//	if err := SendVerificationEmail(usuario.Correo, token); err != nil {
+	//		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al enviar el correo de verificación"})
+	//		return
+	//	}
 	if err := database.DB.Create(&postulacion).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al crear la postulación"})
 		return
@@ -98,6 +94,7 @@ func Postularpractica(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Postulación creada exitosamente"})
 }
 
+/*
 func GenerateVerificationToken(email string, practicaid uint, idusuario int) (string, error) {
 	claims := jwt.MapClaims{}
 	claims["authorized"] = true
@@ -157,3 +154,4 @@ func VerifyPostulacionHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Token inválido o expirado"})
 	}
 }
+*/

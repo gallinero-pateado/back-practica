@@ -33,8 +33,6 @@ definitions:
         type: string
       Ubicacion:
         type: string
-      id:
-        type: integer
     type: object
   Crudempresa.practicasRequest:
     properties:
@@ -58,6 +56,15 @@ definitions:
         type: string
       Ubicacion:
         type: string
+    type: object
+  auth.EditProfileRequest:
+    properties:
+      ano_ingreso:
+        type: string
+      fecha_nacimiento:
+        type: string
+      id_carrera:
+        type: integer
     type: object
   auth.EmailRequest:
     properties:
@@ -265,8 +272,6 @@ definitions:
       PerfilCompletado:
         type: boolean
       Rol:
-        type: string
-      fecha_creacion:
         type: string
       firebase_usuario:
         type: string
@@ -759,6 +764,86 @@ paths:
           schema:
             $ref: '#/definitions/auth.ErrorResponse'
       summary: Completar o actualizar perfil de usuario
+      tags:
+      - profile
+  /complete-profile/empresa:
+    post:
+      consumes:
+      - application/json
+      description: Permite a los usuarios autenticados completar o actualizar su perfil
+        de empresa
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Datos para actualizar el perfil
+        in: body
+        name: profile
+        required: true
+        schema:
+          $ref: '#/definitions/auth.ProfileUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Perfil actualizado correctamente
+          schema:
+            $ref: '#/definitions/auth.SuccessResponse'
+        "400":
+          description: Datos inválidos
+          schema:
+            $ref: '#/definitions/auth.ErrorResponse'
+        "401":
+          description: Usuario no autenticado
+          schema:
+            $ref: '#/definitions/auth.ErrorResponse'
+        "500":
+          description: Error al actualizar el perfil
+          schema:
+            $ref: '#/definitions/auth.ErrorResponse'
+      summary: Completar o actualizar perfil de usuario empresa
+      tags:
+      - profile
+  /edit-profile:
+    patch:
+      consumes:
+      - application/json
+      description: Permite a los usuarios autenticados actualizar selectivamente su
+        perfil
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Datos para actualizar el perfil
+        in: body
+        name: profile
+        required: true
+        schema:
+          $ref: '#/definitions/auth.EditProfileRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Perfil editado correctamente
+          schema:
+            $ref: '#/definitions/auth.SuccessResponse'
+        "400":
+          description: Datos inválidos
+          schema:
+            $ref: '#/definitions/auth.ErrorResponse'
+        "401":
+          description: Usuario no autenticado
+          schema:
+            $ref: '#/definitions/auth.ErrorResponse'
+        "500":
+          description: Error al editar el perfil
+          schema:
+            $ref: '#/definitions/auth.ErrorResponse'
+      summary: Editar perfil de usuario
       tags:
       - profile
   /filtro-practicas:

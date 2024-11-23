@@ -777,6 +777,65 @@ const docTemplate = `{
                 }
             }
         },
+        "/edit-profile": {
+            "patch": {
+                "description": "Permite a los usuarios autenticados actualizar selectivamente su perfil",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "profile"
+                ],
+                "summary": "Editar perfil de usuario",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Datos para actualizar el perfil",
+                        "name": "profile",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth.EditProfileRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Perfil editado correctamente",
+                        "schema": {
+                            "$ref": "#/definitions/auth.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Datos inválidos",
+                        "schema": {
+                            "$ref": "#/definitions/auth.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Usuario no autenticado",
+                        "schema": {
+                            "$ref": "#/definitions/auth.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Error al editar el perfil",
+                        "schema": {
+                            "$ref": "#/definitions/auth.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/filtro-practicas": {
             "get": {
                 "description": "Filtra las prácticas según los parámetros opcionales como modalidad, área de práctica, jornada, ubicación y fecha de publicación",
@@ -1678,6 +1737,20 @@ const docTemplate = `{
                 },
                 "Ubicacion": {
                     "type": "string"
+                }
+            }
+        },
+        "auth.EditProfileRequest": {
+            "type": "object",
+            "properties": {
+                "ano_ingreso": {
+                    "type": "string"
+                },
+                "fecha_nacimiento": {
+                    "type": "string"
+                },
+                "id_carrera": {
+                    "type": "integer"
                 }
             }
         },

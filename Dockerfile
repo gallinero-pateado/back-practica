@@ -19,9 +19,6 @@ RUN go build -o main .
 # Etapa de producción
 FROM alpine:latest
 
-# Directorio de trabajo en el contenedor final 
-WORKDIR /root/
-
 # Copia el binario compilado desde la etapa de construcción
 COPY --from=build /app/main .
 

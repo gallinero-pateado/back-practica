@@ -29,13 +29,14 @@ type practicasRequest struct {
 // @Tags practicas
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "Bearer token"
 // @Param id path string true "ID de la práctica a actualizar"
 // @Param practica body practicasRequest true "Datos de la práctica actualizada"
-// @Success 200 {object} gin.H{"message": "La práctica fue actualizada exitosamente", "id_practica": int}
-// @Failure 400 {object} gin.H{"error": "Descripción del error de solicitud"}
-// @Failure 404 {object} gin.H{"error": "Práctica no encontrada"}
-// @Failure 500 {object} gin.H{"error": "Error al actualizar la práctica en la base de datos"}
-// @Router /Upgradepracticas/{id} [put]
+// @Success 200 {string} string "La práctica fue actualizada exitosamente"
+// @Failure 400 {string} string "Descripción del error de solicitud
+// @Failure 404 {string} string "Práctica no encontrada
+// @Failure 500 {string} string "Error al actualizar la práctica en la base de datos
+// @Router /Update-practicas/{id} [put]
 func UpdatePractica(c *gin.Context) {
 	var req practicasRequest
 	if err := c.ShouldBindJSON(&req); err != nil {

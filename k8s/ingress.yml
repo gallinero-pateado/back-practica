@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: back-practicas-ing
+  annotations:
+    cert-manager.io/issuer: letsencrypt-prod
+
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts: 
+    - api-practicas.tssw.info
+    secretName: cert-ulink
+  rules:
+    - host: api-practicas.tssw.info
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: back-practicas-svc
+                port:
+                  number: 80

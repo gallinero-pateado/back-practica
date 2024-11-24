@@ -23,18 +23,29 @@ type practicaRequest struct {
 	Jornada          string    `json:"Jornada"`
 }
 
+// ErrorResponse representa la estructura de un error
+type ErrorResponse struct {
+	Error string `json:"error"`
+}
+
+// SuccessResponse representa una respuesta exitosa con el ID de la práctica
+type SuccessResponse struct {
+	Message    string `json:"message"`
+	IdPractica int    `json:"id_practica"`
+}
+
 // Createpractica crea una nueva oferta de práctica
 // @Summary Crea una nueva oferta de práctica
 // @Description Crea una oferta de práctica basada en los datos proporcionados y la guarda en la base de datos
 // @Tags practicas
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "Bearer token"
 // @Param practica body practicaRequest true "Datos de la nueva práctica"
-// @Success 200 {object} gin.H "Oferta de práctica creada exitosamente con el ID de la práctica"
+// @Success 200 {object} SuccessResponse "Oferta de práctica creada exitosamente con el ID de la práctica"
 // @Failure 400 {object} ErrorResponse "Datos inválidos"
 // @Failure 500 {object} ErrorResponse "Error al guardar la práctica en la base de datos"
-// @Router /Createpracticas [post]
-
+// @Router /Create-practicas [post]
 func Createpractica(c *gin.Context) {
 	var req practicaRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -83,5 +94,8 @@ func Createpractica(c *gin.Context) {
 	}
 
 	// Respuesta exitosa con el ID de la práctica creada
-	c.JSON(http.StatusOK, gin.H{"message": "La oferta de práctica fue creada exitosamente", "id_practica": practica.Id})
+	c.JSON(http.StatusOK, SuccessResponse{
+		Message:    "La oferta de práctica fue creada exitosamente",
+		IdPractica: int(practica.Id), // Convertir de uint a int
+	})
 }

@@ -48,6 +48,7 @@ func SetupRoutes() *gin.Engine {
 		protected.POST("/complete-profile/empresa", auth.CompleteProfileEmpresaHandler) // Ruta para completar perfil
 		protected.POST("/upload-image", upload.UploadImageHandler)                      // Ruta para subir imágenes
 		protected.GET("/profile-status", auth.GetProfileStatusHandler)                  // Ruta para obtener el estado del perfil
+		protected.GET("/profile-status/empresa", auth.GetProfileStatusEmpresaHandler)   // Ruta para obtener el estado del perfil de empresa
 		protected.POST("/postulacion-practicas/:practicaid", postular.Postularpractica) // Ruta para postular a practicas como usuario
 		protected.DELETE("/Delete-practica/:id", Cempresa.DeletePractica)               // Ruta para borrar practica como empresa
 		protected.POST("/Create-practicas", Cempresa.Createpractica)                    // Ruta para Crear Practicas como empresa

@@ -48,13 +48,13 @@ func CompleteProfileEmpresaHandler(c *gin.Context) {
 	// Actualizar solo los campos no relacionados con la foto de perfil
 	var empresa models.Usuario_empresa
 	result := database.DB.Model(&empresa).Where("firebase_usuario_empresa = ?", uid).Updates(models.Usuario_empresa{
-		Sector:              req.Sector,
-		Descripcion:         req.Descripcion,
-		Direccion:           req.Direccion,
-		Persona_contacto:    req.Persona_contacto,
-		Correo_contacto:     req.Correo_contacto,
-		Telefono_contacto:   req.Telefono_contacto,
-		Estado_verificacion: 1,
+		Sector:            req.Sector,
+		Descripcion:       req.Descripcion,
+		Direccion:         req.Direccion,
+		Persona_contacto:  req.Persona_contacto,
+		Correo_contacto:   req.Correo_contacto,
+		Telefono_contacto: req.Telefono_contacto,
+		Perfil_Completado: true,
 	})
 
 	if result.Error != nil {

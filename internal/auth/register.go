@@ -75,6 +75,7 @@ func RegisterHandler(c *gin.Context) {
 		Apellidos:        req.Apellidos,
 		Firebase_usuario: user.UID,
 		Id_carrera:       1,
+		PerfilCompletado: false,
 		Rol:              "estudiante", // Rol por defecto
 	}
 

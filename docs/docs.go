@@ -1100,6 +1100,53 @@ const docTemplate = `{
                 }
             }
         },
+        "/profile-status/empresa": {
+            "get": {
+                "description": "Retorna si el perfil ha sido completado o no",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "profile"
+                ],
+                "summary": "Obtener estado del perfil",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Estado del perfil",
+                        "schema": {
+                            "$ref": "#/definitions/auth.ProfileStatusResponses"
+                        }
+                    },
+                    "400": {
+                        "description": "Datos inválidos",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "Usuario no autenticado",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/register": {
             "post": {
                 "description": "Crea un nuevo usuario en Firebase y lo guarda en la base de datos local",
@@ -1811,6 +1858,14 @@ const docTemplate = `{
             }
         },
         "auth.ProfileStatusResponse": {
+            "type": "object",
+            "properties": {
+                "perfil_completado": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "auth.ProfileStatusResponses": {
             "type": "object",
             "properties": {
                 "perfil_completado": {

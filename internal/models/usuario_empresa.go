@@ -9,7 +9,7 @@ type Usuario_empresa struct {
 	Descripcion              string `json:"Descripcion"`
 	Direccion                string `json:"Direccion"`
 	Persona_contacto         string `json:"Persona_contacto"`
-	Correo_contacto          uint   `json:"Correo_contacto"`
+	Correo_contacto          string `json:"Correo_contacto"`
 	Telefono_contacto        int    `json:"Telefono_contacto"`
 	Estado_verificacion      uint   `json:"Estado_verificacion"`
 	Rol                      string `json:"Rol"`

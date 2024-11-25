@@ -12,6 +12,7 @@ type Usuario_empresa struct {
 	Correo_contacto          string `json:"Correo_contacto"`
 	Telefono_contacto        int    `json:"Telefono_contacto"`
 	Estado_verificacion      uint   `json:"Estado_verificacion"`
+	Perfil_Completado        bool   `json:"Perfil_Completado"`
 	Rol                      string `json:"Rol"`
 }
 

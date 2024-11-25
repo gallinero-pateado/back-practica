@@ -17,19 +17,13 @@ func SetupRoutes() *gin.Engine {
 
 	// Configurar CORS
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:5173"}, // Cambia el puerto si es necesario
+		AllowOrigins:     []string{"http://localhost", "https://practicas.tssw.info", "https://descuentos.tssw.info", "https://roomies.tssw.info"}, // Cambia el puerto si es necesario
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Authorization", "Content-Type"},
 		ExposeHeaders:    []string{"Content-Length", "Authorization"},
 		AllowCredentials: true,
 	}))
 
-	router.POST("/register", auth.RegisterHandler)
-	router.POST("/login", auth.LoginHandler)
-	router.POST("/register_empresa", auth.RegisterHandler_empresa)
-	router.GET("/verify-email", auth.VerifyEmailHandler)
-	router.POST("/password-reset", auth.SendPasswordResetEmailHandler)
-	router.POST("/resend-verification", auth.ResendVerificationEmailHandler)
 	router.GET("/usuarios/:uid", auth.GetUsuariouid)
 	router.GET("/get-allusuario", auth.GetAllUsuarios)
 	// rutas crud practicas
@@ -48,6 +42,7 @@ func SetupRoutes() *gin.Engine {
 		protected.POST("/complete-profile/empresa", auth.CompleteProfileEmpresaHandler) // Ruta para completar perfil
 		protected.POST("/upload-image", upload.UploadImageHandler)                      // Ruta para subir imágenes
 		protected.GET("/profile-status", auth.GetProfileStatusHandler)                  // Ruta para obtener el estado del perfil
+		protected.GET("/profile-status/empresa", auth.GetProfileStatusEmpresaHandler)   // Ruta para obtener el estado del perfil de empresa
 		protected.POST("/postulacion-practicas/:practicaid", postular.Postularpractica) // Ruta para postular a practicas como usuario
 		protected.DELETE("/Delete-practica/:id", Cempresa.DeletePractica)               // Ruta para borrar practica como empresa
 		protected.POST("/Create-practicas", Cempresa.Createpractica)                    // Ruta para Crear Practicas como empresa
@@ -59,6 +54,7 @@ func SetupRoutes() *gin.Engine {
 		protected.DELETE("/comentarios/:id", foro.EliminarComentario)                   // Eliminar un comentario
 		protected.POST("/comentarios/:id/respuesta", foro.ResponderComentario)          //esto es para responder comentarios
 		protected.PATCH("/edit-profile", auth.EditProfileHandler)                       // Ruta para editar el perfil
+		protected.GET("/practicas/:practicaid/postulaciones", postular.ObtenerPostulantesPorPractica)
 	}
 
 	// Rutas de correos

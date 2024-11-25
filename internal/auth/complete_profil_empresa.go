@@ -26,10 +26,10 @@ type ProfileUpdateRequests struct {
 // @Produce json
 // @Param Authorization header string true "Bearer token"
 // @Param profile body ProfileUpdateRequest true "Datos para actualizar el perfil"
-// @Success 200 {object} SuccessResponse "Perfil actualizado correctamente"
-// @Failure 400 {object} ErrorResponse "Datos inválidos"
-// @Failure 401 {object} ErrorResponse "Usuario no autenticado"
-// @Failure 500 {object} ErrorResponse "Error al actualizar el perfil"
+// @Success 200 {object} string "Perfil actualizado correctamente"
+// @Failure 400 {object} string "Datos inválidos"
+// @Failure 401 {object} string "Usuario no autenticado"
+// @Failure 500 {object} string "Error al actualizar el perfil"
 // @Router /complete-profile/empresa [post]
 func CompleteProfileEmpresaHandler(c *gin.Context) {
 	uid, exists := c.Get("uid")
@@ -48,13 +48,13 @@ func CompleteProfileEmpresaHandler(c *gin.Context) {
 	// Actualizar solo los campos no relacionados con la foto de perfil
 	var empresa models.Usuario_empresa
 	result := database.DB.Model(&empresa).Where("firebase_usuario_empresa = ?", uid).Updates(models.Usuario_empresa{
-		Sector:              req.Sector,
-		Descripcion:         req.Descripcion,
-		Direccion:           req.Direccion,
-		Persona_contacto:    req.Persona_contacto,
-		Correo_contacto:     req.Correo_contacto,
-		Telefono_contacto:   req.Telefono_contacto,
-		Estado_verificacion: 1,
+		Sector:            req.Sector,
+		Descripcion:       req.Descripcion,
+		Direccion:         req.Direccion,
+		Persona_contacto:  req.Persona_contacto,
+		Correo_contacto:   req.Correo_contacto,
+		Telefono_contacto: req.Telefono_contacto,
+		Perfil_Completado: true,
 	})
 
 	if result.Error != nil {

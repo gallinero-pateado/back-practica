@@ -253,7 +253,7 @@ const docTemplate = `{
                     "500": {
                         "description": "Error al obtener los usuarios",
                         "schema": {
-                            "$ref": "#/definitions/auth.ErrorResponse"
+                            "type": "string"
                         }
                     }
                 }
@@ -288,7 +288,7 @@ const docTemplate = `{
                     "404": {
                         "description": "Usuario no encontrado",
                         "schema": {
-                            "$ref": "#/definitions/auth.ErrorResponse"
+                            "type": "string"
                         }
                     }
                 }
@@ -700,19 +700,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Datos inválidos",
                         "schema": {
-                            "$ref": "#/definitions/auth.ErrorResponse"
+                            "type": "string"
                         }
                     },
                     "401": {
                         "description": "Usuario no autenticado",
                         "schema": {
-                            "$ref": "#/definitions/auth.ErrorResponse"
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Error al actualizar el perfil",
                         "schema": {
-                            "$ref": "#/definitions/auth.ErrorResponse"
+                            "type": "string"
                         }
                     }
                 }
@@ -753,25 +753,25 @@ const docTemplate = `{
                     "200": {
                         "description": "Perfil actualizado correctamente",
                         "schema": {
-                            "$ref": "#/definitions/auth.SuccessResponse"
+                            "type": "string"
                         }
                     },
                     "400": {
                         "description": "Datos inválidos",
                         "schema": {
-                            "$ref": "#/definitions/auth.ErrorResponse"
+                            "type": "string"
                         }
                     },
                     "401": {
                         "description": "Usuario no autenticado",
                         "schema": {
-                            "$ref": "#/definitions/auth.ErrorResponse"
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Error al actualizar el perfil",
                         "schema": {
-                            "$ref": "#/definitions/auth.ErrorResponse"
+                            "type": "string"
                         }
                     }
                 }
@@ -812,25 +812,25 @@ const docTemplate = `{
                     "200": {
                         "description": "Perfil editado correctamente",
                         "schema": {
-                            "$ref": "#/definitions/auth.SuccessResponse"
+                            "type": "string"
                         }
                     },
                     "400": {
                         "description": "Datos inválidos",
                         "schema": {
-                            "$ref": "#/definitions/auth.ErrorResponse"
+                            "type": "string"
                         }
                     },
                     "401": {
                         "description": "Usuario no autenticado",
                         "schema": {
-                            "$ref": "#/definitions/auth.ErrorResponse"
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Error al editar el perfil",
                         "schema": {
-                            "$ref": "#/definitions/auth.ErrorResponse"
+                            "type": "string"
                         }
                     }
                 }
@@ -892,52 +892,6 @@ const docTemplate = `{
                         "description": "Error al obtener las prácticas",
                         "schema": {
                             "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/login": {
-            "post": {
-                "description": "Autentica al usuario utilizando Firebase y devuelve un token",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "auth"
-                ],
-                "summary": "Inicia sesión un usuario",
-                "parameters": [
-                    {
-                        "description": "Datos de inicio de sesión",
-                        "name": "user",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/auth.LoginRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Inicio de sesión exitoso",
-                        "schema": {
-                            "$ref": "#/definitions/auth.LoginResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Datos inválidos",
-                        "schema": {
-                            "$ref": "#/definitions/auth.ErrorResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Credenciales incorrectas",
-                        "schema": {
-                            "$ref": "#/definitions/auth.ErrorResponse"
                         }
                     }
                 }
@@ -1007,47 +961,127 @@ const docTemplate = `{
                 }
             }
         },
-        "/password-reset": {
+        "/postulacion-practicas/{practicaid}": {
             "post": {
-                "description": "Permite a los usuarios recuperar su contraseña mediante un correo de recuperación",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
+                "description": "Permite a un estudiante autenticado postular a una práctica específica proporcionando un mensaje.",
                 "tags": [
-                    "password"
+                    "Postulaciones"
                 ],
-                "summary": "Envía un correo de recuperación de contraseña",
+                "summary": "Postulación a práctica",
                 "parameters": [
                     {
-                        "description": "Correo del usuario",
-                        "name": "email",
+                        "type": "string",
+                        "description": "Bearer \u003ctoken\u003e",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID de la práctica",
+                        "name": "practicaid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Datos de la postulación",
+                        "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/auth.PasswordResetRequest"
+                            "$ref": "#/definitions/PostulacionesPractica.PostulacionRequest"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Correo de recuperación enviado con éxito",
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/auth.SuccessResponse"
+                            "$ref": "#/definitions/PostulacionesPractica.PostulacionSuccessResponse"
                         }
                     },
                     "400": {
-                        "description": "Email requerido",
+                        "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/auth.ErrorResponse"
+                            "$ref": "#/definitions/PostulacionesPractica.ErrorResponses"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/PostulacionesPractica.ErrorResponses"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/PostulacionesPractica.ErrorResponses"
                         }
                     },
                     "500": {
-                        "description": "Error al enviar el correo de recuperación",
+                        "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/auth.ErrorResponse"
+                            "$ref": "#/definitions/PostulacionesPractica.ErrorResponses"
+                        }
+                    }
+                }
+            }
+        },
+        "/practicas/{practicaid}/postulaciones": {
+            "get": {
+                "description": "Devuelve la lista de estudiantes que postularon a una práctica específica perteneciente a la empresa autenticada.",
+                "tags": [
+                    "Postulaciones"
+                ],
+                "summary": "Obtiene los postulantes a una práctica específica",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer \u003ctoken\u003e",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID de la práctica",
+                        "name": "practicaid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/PostulacionesPractica.PostulacionResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/PostulacionesPractica.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/PostulacionesPractica.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/PostulacionesPractica.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/PostulacionesPractica.ErrorResponse"
                         }
                     }
                 }
@@ -1082,209 +1116,66 @@ const docTemplate = `{
                     "400": {
                         "description": "Datos inválidos",
                         "schema": {
-                            "$ref": "#/definitions/auth.ErrorResponse"
+                            "type": "string"
                         }
                     },
                     "401": {
                         "description": "Usuario no autenticado",
                         "schema": {
-                            "$ref": "#/definitions/auth.ErrorResponse"
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Error interno del servidor",
                         "schema": {
-                            "$ref": "#/definitions/auth.ErrorResponse"
+                            "type": "string"
                         }
                     }
                 }
             }
         },
-        "/register": {
-            "post": {
-                "description": "Crea un nuevo usuario en Firebase y lo guarda en la base de datos local",
-                "consumes": [
-                    "application/json"
-                ],
+        "/profile-status/empresa": {
+            "get": {
+                "description": "Retorna si el perfil ha sido completado o no",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "auth"
+                    "profile"
                 ],
-                "summary": "Registra un nuevo usuario",
+                "summary": "Obtener estado del perfil",
                 "parameters": [
                     {
-                        "description": "Datos del usuario a registrar",
-                        "name": "user",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/auth.RegisterRequest"
-                        }
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Usuario registrado correctamente",
+                        "description": "Estado del perfil",
                         "schema": {
-                            "$ref": "#/definitions/auth.RegisterResponse"
+                            "$ref": "#/definitions/auth.ProfileStatusResponses"
                         }
                     },
                     "400": {
-                        "description": "Solicitud inválida",
+                        "description": "Datos inválidos",
                         "schema": {
-                            "$ref": "#/definitions/auth.RegisterResponse"
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "Usuario no autenticado",
+                        "schema": {
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Error interno del servidor",
                         "schema": {
-                            "$ref": "#/definitions/auth.RegisterResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/register_admin": {
-            "post": {
-                "description": "Crea un nuevo usuario en Firebase y lo guarda en la base de datos local",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "auth"
-                ],
-                "summary": "Registra un nuevo usuario",
-                "parameters": [
-                    {
-                        "description": "Datos del usuario a registrar",
-                        "name": "user",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/auth.RegisterRequest_admin"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Usuario registrado correctamente",
-                        "schema": {
-                            "$ref": "#/definitions/auth.RegisterResponse_admin"
-                        }
-                    },
-                    "400": {
-                        "description": "Solicitud inválida",
-                        "schema": {
-                            "$ref": "#/definitions/auth.RegisterResponse_admin"
-                        }
-                    },
-                    "500": {
-                        "description": "Error interno del servidor",
-                        "schema": {
-                            "$ref": "#/definitions/auth.RegisterResponse_admin"
-                        }
-                    }
-                }
-            }
-        },
-        "/register_empresa": {
-            "post": {
-                "description": "Crea un nuevo usuario en Firebase y lo guarda en la base de datos local",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "auth"
-                ],
-                "summary": "Registra un nuevo usuario",
-                "parameters": [
-                    {
-                        "description": "Datos del usuario a registrar",
-                        "name": "user",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/auth.RegisterRequest_empresa"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Usuario registrado correctamente",
-                        "schema": {
-                            "$ref": "#/definitions/auth.RegisterResponse_empresa"
-                        }
-                    },
-                    "400": {
-                        "description": "Solicitud inválida",
-                        "schema": {
-                            "$ref": "#/definitions/auth.RegisterResponse_empresa"
-                        }
-                    },
-                    "500": {
-                        "description": "Error interno del servidor",
-                        "schema": {
-                            "$ref": "#/definitions/auth.RegisterResponse_empresa"
-                        }
-                    }
-                }
-            }
-        },
-        "/resend-verification": {
-            "post": {
-                "description": "Reenvía el correo de verificación a un usuario registrado",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "verification"
-                ],
-                "summary": "Reenviar correo de verificación",
-                "parameters": [
-                    {
-                        "description": "Correo del usuario",
-                        "name": "email",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/auth.EmailRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Correo de verificación enviado nuevamente",
-                        "schema": {
-                            "$ref": "#/definitions/auth.SuccessResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Email requerido",
-                        "schema": {
-                            "$ref": "#/definitions/auth.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Usuario no encontrado",
-                        "schema": {
-                            "$ref": "#/definitions/auth.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Error interno del servidor",
-                        "schema": {
-                            "$ref": "#/definitions/auth.ErrorResponse"
+                            "type": "string"
                         }
                     }
                 }
@@ -1740,6 +1631,59 @@ const docTemplate = `{
                 }
             }
         },
+        "PostulacionesPractica.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "PostulacionesPractica.ErrorResponses": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "PostulacionesPractica.PostulacionRequest": {
+            "type": "object",
+            "properties": {
+                "mensaje": {
+                    "description": "Campo para el mensaje del usuario",
+                    "type": "string"
+                }
+            }
+        },
+        "PostulacionesPractica.PostulacionResponse": {
+            "type": "object",
+            "properties": {
+                "correo": {
+                    "type": "string"
+                },
+                "fecha_postulacion": {
+                    "type": "string"
+                },
+                "mensaje": {
+                    "type": "string"
+                },
+                "nombre_estudiante": {
+                    "type": "string"
+                },
+                "practica_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "PostulacionesPractica.PostulacionSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
         "auth.EditProfileRequest": {
             "type": "object",
             "properties": {
@@ -1754,63 +1698,15 @@ const docTemplate = `{
                 }
             }
         },
-        "auth.EmailRequest": {
-            "type": "object",
-            "required": [
-                "email"
-            ],
-            "properties": {
-                "email": {
-                    "type": "string"
-                }
-            }
-        },
-        "auth.ErrorResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string"
-                }
-            }
-        },
-        "auth.LoginRequest": {
-            "type": "object",
-            "required": [
-                "email",
-                "password"
-            ],
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                }
-            }
-        },
-        "auth.LoginResponse": {
-            "type": "object",
-            "properties": {
-                "token": {
-                    "type": "string"
-                },
-                "uid": {
-                    "type": "string"
-                }
-            }
-        },
-        "auth.PasswordResetRequest": {
-            "type": "object",
-            "required": [
-                "email"
-            ],
-            "properties": {
-                "email": {
-                    "type": "string"
-                }
-            }
-        },
         "auth.ProfileStatusResponse": {
+            "type": "object",
+            "properties": {
+                "perfil_completado": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "auth.ProfileStatusResponses": {
             "type": "object",
             "properties": {
                 "perfil_completado": {
@@ -1829,103 +1725,6 @@ const docTemplate = `{
                 },
                 "id_carrera": {
                     "type": "integer"
-                }
-            }
-        },
-        "auth.RegisterRequest": {
-            "type": "object",
-            "required": [
-                "apellidos",
-                "email",
-                "nombres",
-                "password"
-            ],
-            "properties": {
-                "Id_carrera": {
-                    "type": "integer"
-                },
-                "apellidos": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "nombres": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                }
-            }
-        },
-        "auth.RegisterRequest_admin": {
-            "type": "object",
-            "required": [
-                "Email_admin",
-                "Nombre_admin",
-                "password"
-            ],
-            "properties": {
-                "Email_admin": {
-                    "type": "string"
-                },
-                "Nombre_admin": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                }
-            }
-        },
-        "auth.RegisterRequest_empresa": {
-            "type": "object",
-            "required": [
-                "Email_empresa",
-                "Nombre_empresa",
-                "password"
-            ],
-            "properties": {
-                "Email_empresa": {
-                    "type": "string"
-                },
-                "Nombre_empresa": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                }
-            }
-        },
-        "auth.RegisterResponse": {
-            "type": "object",
-            "properties": {
-                "firebase_uid": {
-                    "type": "string"
-                },
-                "message": {
-                    "type": "string"
-                }
-            }
-        },
-        "auth.RegisterResponse_admin": {
-            "type": "object",
-            "properties": {
-                "firebase_uid": {
-                    "type": "string"
-                },
-                "message": {
-                    "type": "string"
-                }
-            }
-        },
-        "auth.RegisterResponse_empresa": {
-            "type": "object",
-            "properties": {
-                "firebase_uid": {
-                    "type": "string"
-                },
-                "message": {
-                    "type": "string"
                 }
             }
         },

@@ -1053,6 +1053,132 @@ const docTemplate = `{
                 }
             }
         },
+        "/postulacion-practicas/{practicaid}": {
+            "post": {
+                "description": "Permite a un estudiante autenticado postular a una práctica específica proporcionando un mensaje.",
+                "tags": [
+                    "Postulaciones"
+                ],
+                "summary": "Postulación a práctica",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer \u003ctoken\u003e",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID de la práctica",
+                        "name": "practicaid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Datos de la postulación",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/PostulacionesPractica.PostulacionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/PostulacionesPractica.PostulacionSuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/PostulacionesPractica.ErrorResponses"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/PostulacionesPractica.ErrorResponses"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/PostulacionesPractica.ErrorResponses"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/PostulacionesPractica.ErrorResponses"
+                        }
+                    }
+                }
+            }
+        },
+        "/practicas/{practicaid}/postulaciones": {
+            "get": {
+                "description": "Devuelve la lista de estudiantes que postularon a una práctica específica perteneciente a la empresa autenticada.",
+                "tags": [
+                    "Postulaciones"
+                ],
+                "summary": "Obtiene los postulantes a una práctica específica",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer \u003ctoken\u003e",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID de la práctica",
+                        "name": "practicaid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/PostulacionesPractica.PostulacionResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/PostulacionesPractica.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/PostulacionesPractica.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/PostulacionesPractica.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/PostulacionesPractica.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/profile-status": {
             "get": {
                 "description": "Retorna si el perfil ha sido completado o no",
@@ -1783,6 +1909,59 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "Ubicacion": {
+                    "type": "string"
+                }
+            }
+        },
+        "PostulacionesPractica.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "PostulacionesPractica.ErrorResponses": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "PostulacionesPractica.PostulacionRequest": {
+            "type": "object",
+            "properties": {
+                "mensaje": {
+                    "description": "Campo para el mensaje del usuario",
+                    "type": "string"
+                }
+            }
+        },
+        "PostulacionesPractica.PostulacionResponse": {
+            "type": "object",
+            "properties": {
+                "correo": {
+                    "type": "string"
+                },
+                "fecha_postulacion": {
+                    "type": "string"
+                },
+                "mensaje": {
+                    "type": "string"
+                },
+                "nombre_estudiante": {
+                    "type": "string"
+                },
+                "practica_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "PostulacionesPractica.PostulacionSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
                     "type": "string"
                 }
             }

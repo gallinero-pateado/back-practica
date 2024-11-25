@@ -10,7 +10,7 @@ spec:
   tls:
   - hosts: 
     - api-practicas.tssw.info
-    secretName: cert-ulink
+    secretName: cert-back-practicas
   rules:
     - host: api-practicas.tssw.info
       http:

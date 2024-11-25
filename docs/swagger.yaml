@@ -100,42 +100,6 @@ definitions:
       id_carrera:
         type: integer
     type: object
-  auth.EmailRequest:
-    properties:
-      email:
-        type: string
-    required:
-    - email
-    type: object
-  auth.ErrorResponse:
-    properties:
-      error:
-        type: string
-    type: object
-  auth.LoginRequest:
-    properties:
-      email:
-        type: string
-      password:
-        type: string
-    required:
-    - email
-    - password
-    type: object
-  auth.LoginResponse:
-    properties:
-      token:
-        type: string
-      uid:
-        type: string
-    type: object
-  auth.PasswordResetRequest:
-    properties:
-      email:
-        type: string
-    required:
-    - email
-    type: object
   auth.ProfileStatusResponse:
     properties:
       perfil_completado:
@@ -154,71 +118,6 @@ definitions:
         type: string
       id_carrera:
         type: integer
-    type: object
-  auth.RegisterRequest:
-    properties:
-      Id_carrera:
-        type: integer
-      apellidos:
-        type: string
-      email:
-        type: string
-      nombres:
-        type: string
-      password:
-        type: string
-    required:
-    - apellidos
-    - email
-    - nombres
-    - password
-    type: object
-  auth.RegisterRequest_admin:
-    properties:
-      Email_admin:
-        type: string
-      Nombre_admin:
-        type: string
-      password:
-        type: string
-    required:
-    - Email_admin
-    - Nombre_admin
-    - password
-    type: object
-  auth.RegisterRequest_empresa:
-    properties:
-      Email_empresa:
-        type: string
-      Nombre_empresa:
-        type: string
-      password:
-        type: string
-    required:
-    - Email_empresa
-    - Nombre_empresa
-    - password
-    type: object
-  auth.RegisterResponse:
-    properties:
-      firebase_uid:
-        type: string
-      message:
-        type: string
-    type: object
-  auth.RegisterResponse_admin:
-    properties:
-      firebase_uid:
-        type: string
-      message:
-        type: string
-    type: object
-  auth.RegisterResponse_empresa:
-    properties:
-      firebase_uid:
-        type: string
-      message:
-        type: string
     type: object
   auth.SuccessResponse:
     properties:
@@ -483,7 +382,7 @@ paths:
         "500":
           description: Error al obtener los usuarios
           schema:
-            $ref: '#/definitions/auth.ErrorResponse'
+            type: string
       summary: Obtiene una lista de todos los usuarios
       tags:
       - usuarios
@@ -507,7 +406,7 @@ paths:
         "404":
           description: Usuario no encontrado
           schema:
-            $ref: '#/definitions/auth.ErrorResponse'
+            type: string
       summary: Obtiene los datos de un usuario por su UID
       tags:
       - usuarios
@@ -793,15 +692,15 @@ paths:
         "400":
           description: Datos inválidos
           schema:
-            $ref: '#/definitions/auth.ErrorResponse'
+            type: string
         "401":
           description: Usuario no autenticado
           schema:
-            $ref: '#/definitions/auth.ErrorResponse'
+            type: string
         "500":
           description: Error al actualizar el perfil
           schema:
-            $ref: '#/definitions/auth.ErrorResponse'
+            type: string
       summary: Completar o actualizar perfil de usuario
       tags:
       - profile
@@ -829,19 +728,19 @@ paths:
         "200":
           description: Perfil actualizado correctamente
           schema:
-            $ref: '#/definitions/auth.SuccessResponse'
+            type: string
         "400":
           description: Datos inválidos
           schema:
-            $ref: '#/definitions/auth.ErrorResponse'
+            type: string
         "401":
           description: Usuario no autenticado
           schema:
-            $ref: '#/definitions/auth.ErrorResponse'
+            type: string
         "500":
           description: Error al actualizar el perfil
           schema:
-            $ref: '#/definitions/auth.ErrorResponse'
+            type: string
       summary: Completar o actualizar perfil de usuario empresa
       tags:
       - profile
@@ -869,19 +768,19 @@ paths:
         "200":
           description: Perfil editado correctamente
           schema:
-            $ref: '#/definitions/auth.SuccessResponse'
+            type: string
         "400":
           description: Datos inválidos
           schema:
-            $ref: '#/definitions/auth.ErrorResponse'
+            type: string
         "401":
           description: Usuario no autenticado
           schema:
-            $ref: '#/definitions/auth.ErrorResponse'
+            type: string
         "500":
           description: Error al editar el perfil
           schema:
-            $ref: '#/definitions/auth.ErrorResponse'
+            type: string
       summary: Editar perfil de usuario
       tags:
       - profile
@@ -926,36 +825,6 @@ paths:
       summary: Filtra las prácticas
       tags:
       - practicas
-  /login:
-    post:
-      consumes:
-      - application/json
-      description: Autentica al usuario utilizando Firebase y devuelve un token
-      parameters:
-      - description: Datos de inicio de sesión
-        in: body
-        name: user
-        required: true
-        schema:
-          $ref: '#/definitions/auth.LoginRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Inicio de sesión exitoso
-          schema:
-            $ref: '#/definitions/auth.LoginResponse'
-        "400":
-          description: Datos inválidos
-          schema:
-            $ref: '#/definitions/auth.ErrorResponse'
-        "401":
-          description: Credenciales incorrectas
-          schema:
-            $ref: '#/definitions/auth.ErrorResponse'
-      summary: Inicia sesión un usuario
-      tags:
-      - auth
   /notificaciones:
     post:
       consumes:
@@ -998,37 +867,6 @@ paths:
       summary: Enviar notificación de prueba
       tags:
       - notificaciones
-  /password-reset:
-    post:
-      consumes:
-      - application/json
-      description: Permite a los usuarios recuperar su contraseña mediante un correo
-        de recuperación
-      parameters:
-      - description: Correo del usuario
-        in: body
-        name: email
-        required: true
-        schema:
-          $ref: '#/definitions/auth.PasswordResetRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Correo de recuperación enviado con éxito
-          schema:
-            $ref: '#/definitions/auth.SuccessResponse'
-        "400":
-          description: Email requerido
-          schema:
-            $ref: '#/definitions/auth.ErrorResponse'
-        "500":
-          description: Error al enviar el correo de recuperación
-          schema:
-            $ref: '#/definitions/auth.ErrorResponse'
-      summary: Envía un correo de recuperación de contraseña
-      tags:
-      - password
   /postulacion-practicas/{practicaid}:
     post:
       description: Permite a un estudiante autenticado postular a una práctica específica
@@ -1134,15 +972,15 @@ paths:
         "400":
           description: Datos inválidos
           schema:
-            $ref: '#/definitions/auth.ErrorResponse'
+            type: string
         "401":
           description: Usuario no autenticado
           schema:
-            $ref: '#/definitions/auth.ErrorResponse'
+            type: string
         "500":
           description: Error interno del servidor
           schema:
-            $ref: '#/definitions/auth.ErrorResponse'
+            type: string
       summary: Obtener estado del perfil
       tags:
       - profile
@@ -1177,133 +1015,6 @@ paths:
       summary: Obtener estado del perfil
       tags:
       - profile
-  /register:
-    post:
-      consumes:
-      - application/json
-      description: Crea un nuevo usuario en Firebase y lo guarda en la base de datos
-        local
-      parameters:
-      - description: Datos del usuario a registrar
-        in: body
-        name: user
-        required: true
-        schema:
-          $ref: '#/definitions/auth.RegisterRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Usuario registrado correctamente
-          schema:
-            $ref: '#/definitions/auth.RegisterResponse'
-        "400":
-          description: Solicitud inválida
-          schema:
-            $ref: '#/definitions/auth.RegisterResponse'
-        "500":
-          description: Error interno del servidor
-          schema:
-            $ref: '#/definitions/auth.RegisterResponse'
-      summary: Registra un nuevo usuario
-      tags:
-      - auth
-  /register_admin:
-    post:
-      consumes:
-      - application/json
-      description: Crea un nuevo usuario en Firebase y lo guarda en la base de datos
-        local
-      parameters:
-      - description: Datos del usuario a registrar
-        in: body
-        name: user
-        required: true
-        schema:
-          $ref: '#/definitions/auth.RegisterRequest_admin'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Usuario registrado correctamente
-          schema:
-            $ref: '#/definitions/auth.RegisterResponse_admin'
-        "400":
-          description: Solicitud inválida
-          schema:
-            $ref: '#/definitions/auth.RegisterResponse_admin'
-        "500":
-          description: Error interno del servidor
-          schema:
-            $ref: '#/definitions/auth.RegisterResponse_admin'
-      summary: Registra un nuevo usuario
-      tags:
-      - auth
-  /register_empresa:
-    post:
-      consumes:
-      - application/json
-      description: Crea un nuevo usuario en Firebase y lo guarda en la base de datos
-        local
-      parameters:
-      - description: Datos del usuario a registrar
-        in: body
-        name: user
-        required: true
-        schema:
-          $ref: '#/definitions/auth.RegisterRequest_empresa'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Usuario registrado correctamente
-          schema:
-            $ref: '#/definitions/auth.RegisterResponse_empresa'
-        "400":
-          description: Solicitud inválida
-          schema:
-            $ref: '#/definitions/auth.RegisterResponse_empresa'
-        "500":
-          description: Error interno del servidor
-          schema:
-            $ref: '#/definitions/auth.RegisterResponse_empresa'
-      summary: Registra un nuevo usuario
-      tags:
-      - auth
-  /resend-verification:
-    post:
-      consumes:
-      - application/json
-      description: Reenvía el correo de verificación a un usuario registrado
-      parameters:
-      - description: Correo del usuario
-        in: body
-        name: email
-        required: true
-        schema:
-          $ref: '#/definitions/auth.EmailRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Correo de verificación enviado nuevamente
-          schema:
-            $ref: '#/definitions/auth.SuccessResponse'
-        "400":
-          description: Email requerido
-          schema:
-            $ref: '#/definitions/auth.ErrorResponse'
-        "404":
-          description: Usuario no encontrado
-          schema:
-            $ref: '#/definitions/auth.ErrorResponse'
-        "500":
-          description: Error interno del servidor
-          schema:
-            $ref: '#/definitions/auth.ErrorResponse'
-      summary: Reenviar correo de verificación
-      tags:
-      - verification
   /sendemail:
     post:
       consumes:

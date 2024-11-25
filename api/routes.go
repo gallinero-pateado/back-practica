@@ -17,19 +17,13 @@ func SetupRoutes() *gin.Engine {
 
 	// Configurar CORS
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:5173"}, // Cambia el puerto si es necesario
+		AllowOrigins:     []string{"http://localhost", "https://practicas.tssw.info", "https://descuentos.tssw.info", "https://roomies.tssw.info"}, // Cambia el puerto si es necesario
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Authorization", "Content-Type"},
 		ExposeHeaders:    []string{"Content-Length", "Authorization"},
 		AllowCredentials: true,
 	}))
 
-	router.POST("/register", auth.RegisterHandler)
-	router.POST("/login", auth.LoginHandler)
-	router.POST("/register_empresa", auth.RegisterHandler_empresa)
-	router.GET("/verify-email", auth.VerifyEmailHandler)
-	router.POST("/password-reset", auth.SendPasswordResetEmailHandler)
-	router.POST("/resend-verification", auth.ResendVerificationEmailHandler)
 	router.GET("/usuarios/:uid", auth.GetUsuariouid)
 	router.GET("/get-allusuario", auth.GetAllUsuarios)
 	// rutas crud practicas

@@ -20,9 +20,9 @@ type ProfileStatusResponse struct {
 // @Produce json
 // @Param Authorization header string true "Bearer token"
 // @Success 200 {object} ProfileStatusResponse "Estado del perfil"
-// @Failure 400 {object} ErrorResponse "Datos inválidos"
-// @Failure 401 {object} ErrorResponse "Usuario no autenticado"
-// @Failure 500 {object} ErrorResponse "Error interno del servidor"
+// @Failure 400 {object} string "Datos inválidos"
+// @Failure 401 {object} string "Usuario no autenticado"
+// @Failure 500 {object} string "Error interno del servidor"
 // @Router /profile-status [get]
 func GetProfileStatusHandler(c *gin.Context) {
 	uid, exists := c.Get("uid")

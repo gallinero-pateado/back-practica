@@ -15,7 +15,7 @@ import (
 // @Produce json
 // @Param uid path string true "UID del usuario"
 // @Success 200 {object} models.Usuario "Datos del usuario encontrados"
-// @Failure 404 {object} ErrorResponse "Usuario no encontrado"
+// @Failure 404 {object} string "Usuario no encontrado"
 // @Router /Getusuario/{uid} [get]
 // GetUsuariouid maneja la búsqueda del usuario por su UID
 func GetUsuariouid(c *gin.Context) {

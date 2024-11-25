@@ -57,6 +57,40 @@ definitions:
       Ubicacion:
         type: string
     type: object
+  PostulacionesPractica.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  PostulacionesPractica.ErrorResponses:
+    properties:
+      error:
+        type: string
+    type: object
+  PostulacionesPractica.PostulacionRequest:
+    properties:
+      mensaje:
+        description: Campo para el mensaje del usuario
+        type: string
+    type: object
+  PostulacionesPractica.PostulacionResponse:
+    properties:
+      correo:
+        type: string
+      fecha_postulacion:
+        type: string
+      mensaje:
+        type: string
+      nombre_estudiante:
+        type: string
+      practica_id:
+        type: integer
+    type: object
+  PostulacionesPractica.PostulacionSuccessResponse:
+    properties:
+      message:
+        type: string
+    type: object
   auth.EditProfileRequest:
     properties:
       ano_ingreso:
@@ -995,6 +1029,92 @@ paths:
       summary: Envía un correo de recuperación de contraseña
       tags:
       - password
+  /postulacion-practicas/{practicaid}:
+    post:
+      description: Permite a un estudiante autenticado postular a una práctica específica
+        proporcionando un mensaje.
+      parameters:
+      - description: Bearer <token>
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: ID de la práctica
+        in: path
+        name: practicaid
+        required: true
+        type: string
+      - description: Datos de la postulación
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/PostulacionesPractica.PostulacionRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/PostulacionesPractica.PostulacionSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/PostulacionesPractica.ErrorResponses'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/PostulacionesPractica.ErrorResponses'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/PostulacionesPractica.ErrorResponses'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/PostulacionesPractica.ErrorResponses'
+      summary: Postulación a práctica
+      tags:
+      - Postulaciones
+  /practicas/{practicaid}/postulaciones:
+    get:
+      description: Devuelve la lista de estudiantes que postularon a una práctica
+        específica perteneciente a la empresa autenticada.
+      parameters:
+      - description: Bearer <token>
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: ID de la práctica
+        in: path
+        name: practicaid
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/PostulacionesPractica.PostulacionResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/PostulacionesPractica.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/PostulacionesPractica.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/PostulacionesPractica.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/PostulacionesPractica.ErrorResponse'
+      summary: Obtiene los postulantes a una práctica específica
+      tags:
+      - Postulaciones
   /profile-status:
     get:
       description: Retorna si el perfil ha sido completado o no

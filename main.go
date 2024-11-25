@@ -27,22 +27,6 @@ func main() {
 		log.Fatalf("Error inicializando la base de datos: %v", err)
 	}
 
-	//	// Realizar la migración de la tabla fuera de la transacción
-	//	if !database.DB.Migrator().HasTable(&models.Usuario{}) {
-	//		err = database.DB.AutoMigrate(&models.Usuario{})
-	//		if err != nil {
-	//			log.Fatalf("Error al migrar modelos: %v", err)
-	//		}
-	//	}
-
-	// Realizar la migración de la tabla fuera de la transacción
-	//	if !database.DB.Migrator().HasTable(&models.Usuario_empresa{}) {
-	//		err = database.DB.AutoMigrate(&models.Usuario_empresa{})
-	//		if err != nil {
-	//			log.Fatalf("Error al migrar modelos: %v", err)
-	//		}
-	//	}
-
 	// Inicializar Firebase
 	err = auth.InitFirebase()
 	if err != nil {

@@ -22,10 +22,10 @@ type EditProfileRequest struct {
 // @Produce json
 // @Param Authorization header string true "Bearer token"
 // @Param profile body EditProfileRequest true "Datos para actualizar el perfil"
-// @Success 200 {object} SuccessResponse "Perfil editado correctamente"
-// @Failure 400 {object} ErrorResponse "Datos inválidos"
-// @Failure 401 {object} ErrorResponse "Usuario no autenticado"
-// @Failure 500 {object} ErrorResponse "Error al editar el perfil"
+// @Success 200 {object} string "Perfil editado correctamente"
+// @Failure 400 {object} string "Datos inválidos"
+// @Failure 401 {object} string "Usuario no autenticado"
+// @Failure 500 {object} string "Error al editar el perfil"
 // @Router /edit-profile [patch]
 func EditProfileHandler(c *gin.Context) {
 	uid, exists := c.Get("uid")

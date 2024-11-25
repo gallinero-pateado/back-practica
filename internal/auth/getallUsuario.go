@@ -14,7 +14,7 @@ import (
 // @Tags usuarios
 // @Produce json
 // @Success 200 {array} models.Usuario "Lista de usuarios obtenida con éxito"
-// @Failure 500 {object} ErrorResponse "Error al obtener los usuarios"
+// @Failure 500 {object} string "Error al obtener los usuarios"
 // @Router /GetAllusuarios [get]
 // GetAllUsuarios maneja la recuperación de todos los usuarios
 func GetAllUsuarios(c *gin.Context) {

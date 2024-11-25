@@ -17,6 +17,16 @@ spec:
       containers:
       - name: back-practicas
         image: <IMAGE>
+        volumeMounts:
+        - name: app-env-volume
+          mountPath: /app/config/app.env
+          subPath: app.env
+          readOnly: true
+        # Montar config.json en /app/config.json
+        - name: config-json-volume
+          mountPath: /app/config/serviceAccountKey.json
+          subPath: serviceAccountKey.json
+          readOnly: true
         ports:
         - containerPort: 8080
         resources:
@@ -26,3 +36,16 @@ spec:
           limits:
             memory: 128Mi
             cpu: 100m
+      volumes:
+      - name: app-env-volume
+        secret:
+          secretName: app-env
+          items:
+          - key: app.env
+            path: app.env
+      - name: config-json-volume
+        secret:
+          secretName: firebase-sakey-json
+          items:
+          - key: serviceAccountKey.json
+            path: serviceAccountKey.json

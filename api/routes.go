@@ -41,6 +41,9 @@ func SetupRoutes() *gin.Engine {
 		protected.POST("/complete-profile", auth.CompleteProfileHandler)                // Ruta para completar perfil
 		protected.POST("/complete-profile/empresa", auth.CompleteProfileEmpresaHandler) // Ruta para completar perfil
 		protected.POST("/upload-image", upload.UploadImageHandler)                      // Ruta para subir imágenes
+		protected.POST("/update-image", upload.UpdateImageHandler)                      //Ruta Actualizar imagen
+		protected.POST("/upload-pdf", upload.UploadPDFHandler)                          //Ruta para subir CV
+		protected.POST("/update-pdf", upload.UploadPDFHandler)                          //Ruta actualizar CV
 		protected.GET("/profile-status", auth.GetProfileStatusHandler)                  // Ruta para obtener el estado del perfil
 		protected.GET("/profile-status/empresa", auth.GetProfileStatusEmpresaHandler)   // Ruta para obtener el estado del perfil de empresa
 		protected.POST("/postulacion-practicas/:practicaid", postular.Postularpractica) // Ruta para postular a practicas como usuario

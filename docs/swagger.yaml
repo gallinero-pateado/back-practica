@@ -195,6 +195,8 @@ definitions:
         type: string
       Apellidos:
         type: string
+      CV:
+        type: string
       Correo:
         type: string
       Fecha_Nacimiento:
@@ -1217,6 +1219,101 @@ paths:
       summary: Añadir un comentario o respuesta a un tema
       tags:
       - Foro
+  /update-image:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Sube una nueva imagen a Firebase Storage, elimina la anterior (si
+        existe) y actualiza el perfil del usuario autenticado
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Nueva imagen a subir
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: URL de la imagen actualizada y mensaje de éxito
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Error en la solicitud
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Usuario no autenticado
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Error al actualizar la imagen
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Actualizar una imagen de perfil
+      tags:
+      - upload
+  /update-pdf:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Sube un nuevo archivo PDF a Firebase Storage, elimina el archivo
+        anterior (si existe) y actualiza el campo correspondiente en la base de datos
+        del usuario autenticado
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Nuevo archivo PDF a subir
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: URL del PDF actualizado y mensaje de éxito
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Error en la solicitud
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Usuario no autenticado
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Error al actualizar el archivo PDF
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Actualizar un archivo PDF
+      tags:
+      - upload
   /upload-image:
     post:
       consumes:
@@ -1262,6 +1359,53 @@ paths:
               type: string
             type: object
       summary: Subir una imagen de perfil
+      tags:
+      - upload
+  /upload-pdf:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Sube un archivo PDF a Firebase Storage y actualiza el campo en
+        la base de datos del usuario autenticado
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Archivo PDF a subir
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: URL del PDF subido y mensaje de éxito
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Error en la solicitud
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Usuario no autenticado
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Error al subir el archivo PDF
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Subir un archivo PDF
       tags:
       - upload
 swagger: "2.0"
